@@ -21,7 +21,7 @@ Reactカリキュラムのワーク用リポジトリです。
 
 ```bash
 git clone <リポジトリURL>
-cd taskapp
+cd react-curriculum-work
 ```
 
 ### 2. 環境変数ファイルを作成
