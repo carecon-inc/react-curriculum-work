@@ -2,6 +2,7 @@
 
 import { CreateProjectModal } from "@/app/(home)/_components/create-project-modal";
 import { DeleteConfirmModal } from "@/app/(home)/_components/delete-confirm-modal";
+import { EditProjectModal } from "@/app/(home)/_components/edit-project-modal";
 import { ProjectCard } from "@/app/(home)/_components/project-card";
 import { ProjectWithInfo } from "@/types/project";
 import { Folder, Plus } from "lucide-react";
@@ -38,11 +39,13 @@ export default function Home() {
     const [projects, setProjects] =
         useState<ProjectWithInfo[]>(initialProjects);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [selectedProject, setSelectedProject] =
-        useState<ProjectWithInfo | null>(null);
     const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
     const [projectToDelete, setProjectToDelete] =
         useState<ProjectWithInfo | null>(null);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [projectToEdit, setProjectToEdit] = useState<ProjectWithInfo | null>(
+        null,
+    );
 
     const handleCreateProject = (name: string, description: string) => {
         const colors = [
@@ -62,6 +65,21 @@ export default function Home() {
         };
         setProjects((prev) => [...prev, newProject]);
         setIsModalOpen(false);
+    };
+
+    const handleEditClick = (e: React.MouseEvent, project: ProjectWithInfo) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setProjectToEdit(project);
+        setIsEditModalOpen(true);
+    };
+
+    const handleSaveEdit = (id: string, name: string, description: string) => {
+        setProjects((prev) =>
+            prev.map((p) => (p.id === id ? { ...p, name, description } : p)),
+        );
+        setProjectToEdit(null);
+        setIsEditModalOpen(false);
     };
 
     const handleDeleteClick = (
@@ -118,6 +136,7 @@ export default function Home() {
                         <ProjectCard
                             key={project.id}
                             project={project}
+                            onEditClick={handleEditClick}
                             onDeleteClick={handleDeleteClick}
                         />
                     ))}
@@ -151,6 +170,19 @@ export default function Home() {
                 onConfirm={handleConfirmDelete}
                 onCancel={handleCancelDelete}
             />
+
+            {/* プロジェクト編集モーダル */}
+            {projectToEdit && (
+                <EditProjectModal
+                    isOpen={isEditModalOpen}
+                    project={projectToEdit}
+                    onSave={handleSaveEdit}
+                    onClose={() => {
+                        setIsEditModalOpen(false);
+                        setProjectToEdit(null);
+                    }}
+                />
+            )}
         </div>
     );
 }

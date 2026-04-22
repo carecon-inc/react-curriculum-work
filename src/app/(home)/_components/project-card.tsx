@@ -1,13 +1,42 @@
 import { ProjectWithInfo } from "@/types/project";
-import { CheckSquare, Folder, Trash2 } from "lucide-react";
+import {
+    CheckSquare,
+    Folder,
+    MoreVertical,
+    Pencil,
+    Trash2,
+} from "lucide-react";
 import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
 
 type ProjectCardProps = {
     project: ProjectWithInfo;
+    onEditClick: (e: React.MouseEvent, project: ProjectWithInfo) => void;
     onDeleteClick: (e: React.MouseEvent, project: ProjectWithInfo) => void;
 };
 
-export const ProjectCard = ({ project, onDeleteClick }: ProjectCardProps) => {
+export const ProjectCard = ({
+    project,
+    onEditClick,
+    onDeleteClick,
+}: ProjectCardProps) => {
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const menuRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const handleClickOutside = (e: MouseEvent) => {
+            if (
+                menuRef.current &&
+                !menuRef.current.contains(e.target as Node)
+            ) {
+                setIsMenuOpen(false);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () =>
+            document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
+
     return (
         <Link
             href={`/project/${project.id}`}
@@ -19,13 +48,43 @@ export const ProjectCard = ({ project, onDeleteClick }: ProjectCardProps) => {
                 >
                     <Folder className="w-5 h-5 text-white" />
                 </div>
-                <button
-                    onClick={(e) => onDeleteClick(e, project)}
-                    className="opacity-0 group-hover:opacity-100 p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded transition-all"
-                    title="プロジェクトを削除"
-                >
-                    <Trash2 className="w-4 h-4" />
-                </button>
+                <div ref={menuRef} className="relative">
+                    <button
+                        onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            setIsMenuOpen((prev) => !prev);
+                        }}
+                        className="opacity-0 group-hover:opacity-100 p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded transition-all"
+                        title="メニュー"
+                    >
+                        <MoreVertical className="w-4 h-4" />
+                    </button>
+                    {isMenuOpen && (
+                        <div className="absolute right-0 top-8 w-36 bg-white border border-gray-200 rounded-lg shadow-lg z-10 py-1">
+                            <button
+                                onClick={(e) => {
+                                    setIsMenuOpen(false);
+                                    onEditClick(e, project);
+                                }}
+                                className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                            >
+                                <Pencil className="w-4 h-4" />
+                                編集
+                            </button>
+                            <button
+                                onClick={(e) => {
+                                    setIsMenuOpen(false);
+                                    onDeleteClick(e, project);
+                                }}
+                                className="flex items-center gap-2 w-full px-3 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                            >
+                                <Trash2 className="w-4 h-4" />
+                                削除
+                            </button>
+                        </div>
+                    )}
+                </div>
             </div>
             <h3 className="text-lg font-semibold text-gray-900 mb-1">
                 {project.name}
