@@ -5,7 +5,7 @@ import { BaseModal } from "../../../components/base-modal";
 type EditProjectModalProps = {
     isOpen: boolean;
     project: ProjectWithInfo;
-    onSave: (id: string, name: string, description: string) => void;
+    onSave: (id: number, name: string, description: string) => void;
     onClose: () => void;
 };
 
