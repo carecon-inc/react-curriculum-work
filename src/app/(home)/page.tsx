@@ -3,20 +3,11 @@
 import { CreateProjectModal } from "@/app/(home)/_components/create-project-modal";
 import { DeleteConfirmModal } from "@/app/(home)/_components/delete-confirm-modal";
 import { ProjectCard } from "@/app/(home)/_components/project-card";
+import { ProjectWithInfo } from "@/types/project";
 import { Folder, Plus } from "lucide-react";
 import { useState } from "react";
 
-type Project = {
-    id: string;
-    name: string;
-    description: string;
-    taskCount: number;
-    completedCount: number;
-    color: string;
-    createdAt: string;
-};
-
-const initialProjects: Project[] = [
+const initialProjects: ProjectWithInfo[] = [
     {
         id: "1",
         name: "読書TODO",
@@ -24,7 +15,6 @@ const initialProjects: Project[] = [
         taskCount: 10,
         completedCount: 2,
         color: "bg-[#009FE8]",
-        createdAt: "2024-01-15",
     },
     {
         id: "2",
@@ -33,7 +23,6 @@ const initialProjects: Project[] = [
         taskCount: 25,
         completedCount: 12,
         color: "bg-[#EC7426]",
-        createdAt: "2024-02-01",
     },
     {
         id: "3",
@@ -42,20 +31,18 @@ const initialProjects: Project[] = [
         taskCount: 8,
         completedCount: 3,
         color: "bg-emerald-500",
-        createdAt: "2024-03-10",
     },
 ];
 
 export default function Home() {
-    const [projects, setProjects] = useState<Project[]>(initialProjects);
+    const [projects, setProjects] =
+        useState<ProjectWithInfo[]>(initialProjects);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [selectedProject, setSelectedProject] = useState<Project | null>(
-        null,
-    );
+    const [selectedProject, setSelectedProject] =
+        useState<ProjectWithInfo | null>(null);
     const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
-    const [projectToDelete, setProjectToDelete] = useState<Project | null>(
-        null,
-    );
+    const [projectToDelete, setProjectToDelete] =
+        useState<ProjectWithInfo | null>(null);
 
     const handleCreateProject = (name: string, description: string) => {
         const colors = [
@@ -65,20 +52,22 @@ export default function Home() {
             "bg-purple-500",
             "bg-pink-500",
         ];
-        const newProject: Project = {
+        const newProject: ProjectWithInfo = {
             id: Date.now().toString(),
             name,
             description,
             taskCount: 0,
             completedCount: 0,
             color: colors[Math.floor(Math.random() * colors.length)],
-            createdAt: new Date().toISOString().split("T")[0],
         };
         setProjects((prev) => [...prev, newProject]);
         setIsModalOpen(false);
     };
 
-    const handleDeleteClick = (e: React.MouseEvent, project: Project) => {
+    const handleDeleteClick = (
+        e: React.MouseEvent,
+        project: ProjectWithInfo,
+    ) => {
         e.preventDefault();
         e.stopPropagation();
         setProjectToDelete(project);

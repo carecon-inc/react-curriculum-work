@@ -1,19 +1,10 @@
+import { ProjectWithInfo } from "@/types/project";
 import { CheckSquare, Folder, Trash2 } from "lucide-react";
 import Link from "next/link";
 
-type Project = {
-    id: string;
-    name: string;
-    description: string;
-    taskCount: number;
-    completedCount: number;
-    color: string;
-    createdAt: string;
-};
-
 type ProjectCardProps = {
-    project: Project;
-    onDeleteClick: (e: React.MouseEvent, project: Project) => void;
+    project: ProjectWithInfo;
+    onDeleteClick: (e: React.MouseEvent, project: ProjectWithInfo) => void;
 };
 
 export const ProjectCard = ({ project, onDeleteClick }: ProjectCardProps) => {
