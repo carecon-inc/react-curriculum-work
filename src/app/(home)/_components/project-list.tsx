@@ -37,6 +37,7 @@ export const ProjectList = ({ initialProjects }: Props) => {
             setIsModalOpen(false);
         } catch (error) {
             console.error("Failed to create project:", error);
+            alert("プロジェクトの作成に失敗しました。");
         }
     };
 
@@ -71,6 +72,7 @@ export const ProjectList = ({ initialProjects }: Props) => {
             setIsEditModalOpen(false);
         } catch (error) {
             console.error("Failed to update project:", error);
+            alert("プロジェクトの更新に失敗しました。");
         }
     };
 
@@ -97,6 +99,7 @@ export const ProjectList = ({ initialProjects }: Props) => {
                 setIsDeleteConfirmOpen(false);
             } catch (error) {
                 console.error("Failed to delete project:", error);
+                alert("プロジェクトの削除に失敗しました。");
             }
         }
     };
