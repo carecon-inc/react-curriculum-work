@@ -1,5 +1,5 @@
 import { Trash2 } from "lucide-react";
-import { BaseModal } from "../../../components/base-modal";
+import { BaseModal } from "../../../../components/base-modal";
 
 type DeleteConfirmModalProps = {
     isOpen: boolean;

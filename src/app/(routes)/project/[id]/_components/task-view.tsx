@@ -1,6 +1,10 @@
 "use client";
 
-import { createTask, deleteTask, updateTask } from "@/app/project/[id]/action";
+import {
+    createTask,
+    deleteTask,
+    updateTask,
+} from "@/app/(routes)/project/[id]/action";
 import { BackHome } from "@/components/back-home";
 import { apiFetch } from "@/lib/api-client";
 import { Task, TaskStatus } from "@/types/task";

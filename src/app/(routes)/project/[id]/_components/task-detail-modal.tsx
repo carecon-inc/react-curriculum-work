@@ -3,7 +3,7 @@
 import { Task, TaskPriority } from "@/types/task";
 import { Trash2 } from "lucide-react";
 import { useState } from "react";
-import { BaseModal } from "../../../../components/base-modal";
+import { BaseModal } from "../../../../../components/base-modal";
 
 type TaskDetailModalProps = {
     isOpen: boolean;

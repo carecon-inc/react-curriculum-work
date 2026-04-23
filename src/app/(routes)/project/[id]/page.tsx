@@ -1,4 +1,4 @@
-import { getProject, getTasks } from "@/app/project/[id]/action";
+import { getProject, getTasks } from "@/app/(routes)/project/[id]/action";
 import { TaskView } from "./_components/task-view";
 
 type Props = {

@@ -1,14 +1,14 @@
 "use client";
 
-import { CreateProjectModal } from "@/app/(home)/_components/create-project-modal";
-import { DeleteConfirmModal } from "@/app/(home)/_components/delete-confirm-modal";
-import { EditProjectModal } from "@/app/(home)/_components/edit-project-modal";
-import { ProjectCard } from "@/app/(home)/_components/project-card";
+import { CreateProjectModal } from "@/app/(routes)/(home)/_components/create-project-modal";
+import { DeleteConfirmModal } from "@/app/(routes)/(home)/_components/delete-confirm-modal";
+import { EditProjectModal } from "@/app/(routes)/(home)/_components/edit-project-modal";
+import { ProjectCard } from "@/app/(routes)/(home)/_components/project-card";
 import {
     createProject,
     deleteProject,
     updateProject,
-} from "@/app/(home)/action";
+} from "@/app/(routes)/(home)/action";
 import { ProjectWithInfo } from "@/types/project";
 import { Folder, Plus } from "lucide-react";
 import { useState } from "react";
