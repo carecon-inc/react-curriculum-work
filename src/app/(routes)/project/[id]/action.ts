@@ -7,7 +7,6 @@ import {
     getTasksSchema,
     updateTaskSchema,
 } from "@/lib/zod/schemas/task.schema";
-import { ProjectWithInfo } from "@/types/project";
 import { Task } from "@/types/task";
 
 const PROJECT_COLORS = [
@@ -19,35 +18,24 @@ const PROJECT_COLORS = [
 ];
 
 /**
- * 指定プロジェクトを1件取得する
+ * 指定プロジェクトの名前を取得する
  * @param id プロジェクトID
- * @returns プロジェクト
+ * @returns プロジェクトの名前
  */
-export async function getProject(id: number): Promise<ProjectWithInfo> {
+export async function getProjectName(
+    id: number,
+): Promise<{ id: number; name: string }> {
     const project = await prisma.project.findUniqueOrThrow({
         where: { id },
         select: {
             id: true,
             name: true,
-            description: true,
-            tasks: {
-                select: { status: true },
-            },
         },
     });
-
-    const taskCount = project.tasks.length;
-    const completedCount = project.tasks.filter(
-        (task) => task.status === "DONE",
-    ).length;
 
     return {
         id: project.id,
         name: project.name,
-        description: project.description ?? "",
-        taskCount,
-        completedCount,
-        color: PROJECT_COLORS[project.id % PROJECT_COLORS.length],
     };
 }
 

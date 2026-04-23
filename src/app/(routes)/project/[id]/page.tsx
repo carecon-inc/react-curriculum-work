@@ -1,4 +1,4 @@
-import { getProject, getTasks } from "@/app/(routes)/project/[id]/action";
+import { getProjectName, getTasks } from "@/app/(routes)/project/[id]/action";
 import { TaskView } from "./_components/task-view";
 
 type Props = {
@@ -10,7 +10,7 @@ export default async function ProjectDetail({ params }: Props) {
     const projectId = Number(id);
 
     const [project, tasks] = await Promise.all([
-        getProject(projectId),
+        getProjectName(projectId),
         getTasks(projectId),
     ]);
 
