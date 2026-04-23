@@ -121,6 +121,8 @@ docker compose exec app npx prisma migrate dev --name <変更内容の名前>
 docker compose exec app npm run db:generate
 ```
 
+※ 上記を実施して、DBやPrismaクライアント（型定義ファイル）に変更が反映されているが、エラーが発生する場合は、一度Dockerコンテナを立ち上げ直してみてください。
+
 ---
 
 ## 🔧 トラブルシューティング
