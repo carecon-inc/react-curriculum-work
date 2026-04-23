@@ -3,6 +3,7 @@
 import {
     createTask,
     deleteTask,
+    getAdvice,
     updateTask,
 } from "@/app/(routes)/project/[id]/action";
 import { BackHome } from "@/components/back-home";
@@ -10,6 +11,7 @@ import { apiFetch } from "@/lib/api-client";
 import { Task, TaskStatus } from "@/types/task";
 import { Download, ListTodo, Table } from "lucide-react";
 import { useState } from "react";
+import { CompletedModal } from "./completed-modal";
 import { KanbanBoard } from "./kanban-board";
 import { TaskDetailModal } from "./task-detail-modal";
 
@@ -27,6 +29,7 @@ export function TaskView({ projectId, projectName, initialTasks }: Props) {
     const [selectedTask, setSelectedTask] = useState<Task | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isDownloading, setIsDownloading] = useState(false);
+    const [advice, setAdvice] = useState<string | null>(null);
 
     // New itemボタンクリック時にモーダルを開く関数
     const handleAddItem = (status: TaskStatus) => {
@@ -62,17 +65,24 @@ export function TaskView({ projectId, projectName, initialTasks }: Props) {
                 setTasks((prev) => [...prev, created]);
             } else {
                 // 更新
-                const saved = await updateTask(Number(updatedTask.id), {
-                    title: updatedTask.title,
-                    description: updatedTask.description,
-                    targetDate: updatedTask.targetDate,
-                    dueDate: updatedTask.dueDate,
-                    priority: updatedTask.priority,
-                    status: updatedTask.status,
-                });
+                const { task: saved, allCompleted } = await updateTask(
+                    Number(updatedTask.id),
+                    {
+                        title: updatedTask.title,
+                        description: updatedTask.description,
+                        targetDate: updatedTask.targetDate,
+                        dueDate: updatedTask.dueDate,
+                        priority: updatedTask.priority,
+                        status: updatedTask.status,
+                    },
+                );
                 setTasks((prev) =>
                     prev.map((task) => (task.id === saved.id ? saved : task)),
                 );
+                if (allCompleted) {
+                    const fetchedAdvice = await getAdvice();
+                    setAdvice(fetchedAdvice);
+                }
             }
             setIsModalOpen(false);
             setSelectedTask(null);
@@ -179,6 +189,15 @@ export function TaskView({ projectId, projectName, initialTasks }: Props) {
                     onSave={handleSaveTask}
                     onClose={handleCloseModal}
                     onDelete={handleDeleteTask}
+                />
+            )}
+
+            {/* Completed Modal */}
+            {advice && (
+                <CompletedModal
+                    isOpen={!!advice}
+                    advice={advice}
+                    onClose={() => setAdvice(null)}
                 />
             )}
         </div>

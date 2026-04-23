@@ -1,5 +1,6 @@
 "use server";
 
+import { apiFetch } from "@/lib/api-client";
 import { prisma } from "@/lib/prisma";
 import {
     createTaskSchema,
@@ -157,7 +158,7 @@ export async function createTask(
  * タスクを更新する
  * @param id タスクID
  * @param data 更新するタスク情報
- * @returns 更新されたタスク
+ * @returns 更新されたタスクと全タスク完了フラグ
  */
 export async function updateTask(
     id: number,
@@ -169,7 +170,7 @@ export async function updateTask(
         priority?: Task["priority"];
         status: Task["status"];
     },
-): Promise<Task> {
+): Promise<{ task: Task; allCompleted: boolean }> {
     const parsed = updateTaskSchema.safeParse({ id, ...data });
 
     if (!parsed.success) {
@@ -196,6 +197,7 @@ export async function updateTask(
             dueDate: true,
             priority: true,
             status: true,
+            projectId: true,
             taskCategories: {
                 select: {
                     category: { select: { name: true } },
@@ -204,19 +206,30 @@ export async function updateTask(
         },
     });
 
+    // 同プロジェクト内の未完了タスク数を確認
+    const incompleteCount = await prisma.task.count({
+        where: {
+            projectId: task.projectId,
+            status: { not: "DONE" },
+        },
+    });
+
     return {
-        id: task.id.toString(),
-        title: task.title,
-        description: task.description ?? "",
-        targetDate: task.targetDate
-            ? task.targetDate.toISOString().split("T")[0]
-            : undefined,
-        dueDate: task.dueDate
-            ? task.dueDate.toISOString().split("T")[0]
-            : undefined,
-        priority: task.priority as Task["priority"],
-        status: task.status as Task["status"],
-        categories: task.taskCategories.map((tc) => tc.category.name),
+        task: {
+            id: task.id.toString(),
+            title: task.title,
+            description: task.description ?? "",
+            targetDate: task.targetDate
+                ? task.targetDate.toISOString().split("T")[0]
+                : undefined,
+            dueDate: task.dueDate
+                ? task.dueDate.toISOString().split("T")[0]
+                : undefined,
+            priority: task.priority as Task["priority"],
+            status: task.status as Task["status"],
+            categories: task.taskCategories.map((tc) => tc.category.name),
+        },
+        allCompleted: incompleteCount === 0,
     };
 }
 
@@ -234,4 +247,15 @@ export async function deleteTask(id: number): Promise<void> {
     await prisma.task.delete({
         where: { id: parsed.data.id },
     });
+}
+
+/**
+ * adviceslip APIからアドバイスを取得する
+ * @returns アドバイス文字列
+ */
+export async function getAdvice(): Promise<string> {
+    const res = await apiFetch("https://api.adviceslip.com/advice");
+
+    const data: { slip: { id: number; advice: string } } = await res.json();
+    return data.slip.advice;
 }
