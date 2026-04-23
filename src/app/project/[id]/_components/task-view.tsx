@@ -2,6 +2,7 @@
 
 import { createTask, deleteTask, updateTask } from "@/app/project/[id]/action";
 import { BackHome } from "@/components/back-home";
+import { apiFetch } from "@/lib/api-client";
 import { Task, TaskStatus } from "@/types/task";
 import { BookOpen, Download, Table } from "lucide-react";
 import { useState } from "react";
@@ -21,6 +22,7 @@ export function TaskView({ projectId, projectName, initialTasks }: Props) {
     const [activeTab, setActiveTab] = useState<ViewTab>("status");
     const [selectedTask, setSelectedTask] = useState<Task | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isDownloading, setIsDownloading] = useState(false);
 
     // New itemボタンクリック時にモーダルを開く関数
     const handleAddItem = (status: TaskStatus) => {
@@ -95,6 +97,31 @@ export function TaskView({ projectId, projectName, initialTasks }: Props) {
         }
     };
 
+    // CSVダウンロード関数
+    const handleDownloadCsv = async () => {
+        setIsDownloading(true);
+        try {
+            const response = await apiFetch(
+                `/api/projects/${projectId}/tasks/csv`,
+            );
+            const blob = await response.blob();
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `${projectName}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+        } catch (error) {
+            alert(
+                error instanceof Error
+                    ? error.message
+                    : "CSVのダウンロードに失敗しました。",
+            );
+        } finally {
+            setIsDownloading(false);
+        }
+    };
+
     return (
         <div className="min-h-screen bg-white text-gray-900 p-6">
             {/* Header */}
@@ -123,9 +150,13 @@ export function TaskView({ projectId, projectName, initialTasks }: Props) {
                     </button>
                 </div>
                 {/* CSV Download */}
-                <button className="flex items-center gap-2 px-3 py-1.5 rounded text-sm border border-gray-300 text-gray-600 hover:bg-gray-100 transition-colors">
+                <button
+                    onClick={handleDownloadCsv}
+                    disabled={isDownloading}
+                    className="flex items-center gap-2 px-3 py-1.5 rounded text-sm border border-gray-300 text-gray-600 hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
                     <Download className="w-4 h-4" />
-                    CSVダウンロード
+                    {isDownloading ? "ダウンロード中..." : "CSVダウンロード"}
                 </button>
             </div>
 
