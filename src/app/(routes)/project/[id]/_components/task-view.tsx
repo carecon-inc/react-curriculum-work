@@ -8,7 +8,7 @@ import {
 import { BackHome } from "@/components/back-home";
 import { apiFetch } from "@/lib/api-client";
 import { Task, TaskStatus } from "@/types/task";
-import { BookOpen, Download, Table } from "lucide-react";
+import { Download, ListTodo, Table } from "lucide-react";
 import { useState } from "react";
 import { KanbanBoard } from "./kanban-board";
 import { TaskDetailModal } from "./task-detail-modal";
@@ -132,7 +132,7 @@ export function TaskView({ projectId, projectName, initialTasks }: Props) {
             <div className="mb-6">
                 <BackHome />
                 <h1 className="text-2xl font-bold flex items-center gap-2 text-gray-900">
-                    <BookOpen className="w-6 h-6 text-[#009FE8]" />
+                    <ListTodo className="w-6 h-6 text-[#009FE8]" />
                     {projectName}
                 </h1>
             </div>

@@ -1,5 +1,5 @@
 import { Task, TaskPriority } from "@/types/task";
-import { BookOpen, Calendar, Flag } from "lucide-react";
+import { BookmarkCheck, Calendar, Flag } from "lucide-react";
 
 const PRIORITY_LABEL: Record<TaskPriority, string> = {
     LOW: "低",
@@ -25,7 +25,7 @@ export const TaskCard = ({ task, onClick }: TaskCardProps) => {
             className="bg-white rounded-md p-3 hover:shadow-md transition-all cursor-pointer border border-gray-200 hover:border-[#009FE8]"
         >
             <div className="flex items-start gap-2">
-                <BookOpen className="w-4 h-4 mt-0.5 flex-shrink-0 text-gray-400" />
+                <BookmarkCheck className="w-4 h-4 mt-0.5 flex-shrink-0 text-gray-400" />
                 <span className="text-sm leading-relaxed text-gray-800 line-clamp-2">
                     {task.title}
                 </span>
