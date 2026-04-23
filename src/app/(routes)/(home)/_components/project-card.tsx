@@ -1,3 +1,4 @@
+import { ProjectColor } from "@/generated/prisma/enums";
 import { ProjectWithInfo } from "@/types/project";
 import {
     CheckSquare,
@@ -37,6 +38,18 @@ export const ProjectCard = ({
             document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
+    // プロジェクトカラーのマッピング関数
+    const getColorClass = (color: ProjectColor): string => {
+        const colorMap: Record<ProjectColor, string> = {
+            BLUE: "bg-[#009FE8]",
+            ORANGE: "bg-[#EC7426]",
+            EMERALD: "bg-emerald-500",
+            PURPLE: "bg-purple-500",
+            PINK: "bg-pink-500",
+        };
+        return colorMap[color] || "bg-gray-300"; // デフォルト色
+    };
+
     return (
         <Link
             href={`/project/${project.id}`}
@@ -44,7 +57,7 @@ export const ProjectCard = ({
         >
             <div className="flex items-start justify-between mb-3">
                 <div
-                    className={`w-10 h-10 ${project.color} rounded-lg flex items-center justify-center`}
+                    className={`w-10 h-10 ${getColorClass(project.color)} rounded-lg flex items-center justify-center`}
                 >
                     <Folder className="w-5 h-5 text-white" />
                 </div>
@@ -106,7 +119,7 @@ export const ProjectCard = ({
             {/* Progress Bar */}
             <div className="mt-3 h-1.5 bg-gray-100 rounded-full overflow-hidden">
                 <div
-                    className={`h-full ${project.color} transition-all`}
+                    className={`h-full ${getColorClass(project.color)} transition-all`}
                     style={{
                         width: `${project.taskCount > 0 ? (project.completedCount / project.taskCount) * 100 : 0}%`,
                     }}

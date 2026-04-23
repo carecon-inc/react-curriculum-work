@@ -1,5 +1,6 @@
 "use server";
 
+import { ProjectColor } from "@/generated/prisma/enums";
 import { prisma } from "@/lib/prisma";
 import {
     createProjectSchema,
@@ -7,14 +8,6 @@ import {
     updateProjectSchema,
 } from "@/lib/zod/schemas/project.schema";
 import { ProjectWithInfo } from "@/types/project";
-
-const PROJECT_COLORS = [
-    "bg-[#009FE8]",
-    "bg-[#EC7426]",
-    "bg-emerald-500",
-    "bg-purple-500",
-    "bg-pink-500",
-];
 
 /**
  * プロジェクトを全て取得する
@@ -29,6 +22,7 @@ export async function getProjects(): Promise<ProjectWithInfo[]> {
             id: true,
             name: true,
             description: true,
+            color: true,
             tasks: {
                 select: {
                     status: true,
@@ -51,7 +45,7 @@ export async function getProjects(): Promise<ProjectWithInfo[]> {
             description: project.description ?? "",
             taskCount,
             completedCount,
-            color: PROJECT_COLORS[project.id % PROJECT_COLORS.length],
+            color: project.color,
         };
     });
 }
@@ -60,13 +54,15 @@ export async function getProjects(): Promise<ProjectWithInfo[]> {
  * 新規プロジェクトを作成する
  * @param name プロジェクト名
  * @param description プロジェクトの説明
+ * @param color プロジェクトカラー
  * @returns 作成されたプロジェクト
  */
 export async function createProject(
     name: string,
     description: string,
+    color: ProjectColor,
 ): Promise<ProjectWithInfo> {
-    const parsed = createProjectSchema.safeParse({ name, description });
+    const parsed = createProjectSchema.safeParse({ name, description, color });
 
     if (!parsed.success) {
         throw new Error(parsed.error.issues[0].message);
@@ -76,11 +72,13 @@ export async function createProject(
         data: {
             name: parsed.data.name,
             description: parsed.data.description,
+            color: parsed.data.color,
         },
         select: {
             id: true,
             name: true,
             description: true,
+            color: true,
         },
     });
 
@@ -90,7 +88,7 @@ export async function createProject(
         description: project.description ?? "",
         taskCount: 0,
         completedCount: 0,
-        color: PROJECT_COLORS[project.id % PROJECT_COLORS.length],
+        color: project.color,
     };
 }
 
@@ -99,14 +97,26 @@ export async function createProject(
  * @param id プロジェクトID
  * @param name プロジェクト名
  * @param description プロジェクトの説明
+ * @param color プロジェクトカラー
  * @returns 更新されたプロジェクト
  */
 export async function updateProject(
     id: number,
     name: string,
     description: string,
-): Promise<{ id: number; name: string; description: string }> {
-    const parsed = updateProjectSchema.safeParse({ id, name, description });
+    color: ProjectColor,
+): Promise<{
+    id: number;
+    name: string;
+    description: string;
+    color: ProjectColor;
+}> {
+    const parsed = updateProjectSchema.safeParse({
+        id,
+        name,
+        description,
+        color,
+    });
 
     if (!parsed.success) {
         throw new Error(parsed.error.issues[0].message);
@@ -117,11 +127,13 @@ export async function updateProject(
         data: {
             name: parsed.data.name,
             description: parsed.data.description,
+            color: parsed.data.color,
         },
         select: {
             id: true,
             name: true,
             description: true,
+            color: true,
         },
     });
 
@@ -129,6 +141,7 @@ export async function updateProject(
         id: updatedProject.id,
         name: updatedProject.name,
         description: updatedProject.description ?? "",
+        color: updatedProject.color,
     };
 }
 

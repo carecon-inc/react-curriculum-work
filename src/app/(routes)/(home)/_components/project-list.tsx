@@ -9,6 +9,7 @@ import {
     deleteProject,
     updateProject,
 } from "@/app/(routes)/(home)/action";
+import { ProjectColor } from "@/generated/prisma/enums";
 import { ProjectWithInfo } from "@/types/project";
 import { Folder, Plus } from "lucide-react";
 import { useState } from "react";
@@ -30,9 +31,13 @@ export const ProjectList = ({ initialProjects }: Props) => {
     );
 
     // 新規プロジェクトを作成する関数
-    const handleCreateProject = async (name: string, description: string) => {
+    const handleCreateProject = async (
+        name: string,
+        description: string,
+        color: ProjectColor,
+    ) => {
         try {
-            const newProject = await createProject(name, description);
+            const newProject = await createProject(name, description, color);
             setProjects((prev) => [newProject, ...prev]);
             setIsModalOpen(false);
         } catch (error) {
@@ -54,9 +59,10 @@ export const ProjectList = ({ initialProjects }: Props) => {
         id: number,
         name: string,
         description: string,
+        color: ProjectColor,
     ) => {
         try {
-            const updated = await updateProject(id, name, description);
+            const updated = await updateProject(id, name, description, color);
             setProjects((prev) =>
                 prev.map((p) =>
                     p.id === updated.id
@@ -64,6 +70,7 @@ export const ProjectList = ({ initialProjects }: Props) => {
                               ...p,
                               name: updated.name,
                               description: updated.description,
+                              color: updated.color,
                           }
                         : p,
                 ),

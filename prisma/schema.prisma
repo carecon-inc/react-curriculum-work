@@ -8,11 +8,12 @@ datasource db {
 }
 
 model Project {
-  id          Int      @id @default(autoincrement())
-  name        String   @db.VarChar(100)
-  description String?  @db.Text
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
+  id          Int          @id @default(autoincrement())
+  name        String       @db.VarChar(100)
+  description String?      @db.Text
+  color       ProjectColor @default(BLUE)
+  createdAt   DateTime     @default(now()) @map("created_at")
+  updatedAt   DateTime     @updatedAt @map("updated_at")
   tasks       Task[]
 
   @@map("projects")
@@ -65,4 +66,12 @@ enum Priority {
   LOW
   MEDIUM
   HIGH
+}
+
+enum ProjectColor {
+  BLUE
+  ORANGE
+  EMERALD
+  PURPLE
+  PINK
 }

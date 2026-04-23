@@ -1,11 +1,18 @@
+import { BaseModal } from "@/components/base-modal";
+import { ColorPicker } from "@/components/color-picker";
+import { ProjectColor } from "@/generated/prisma/enums";
 import { ProjectWithInfo } from "@/types/project";
 import { useState } from "react";
-import { BaseModal } from "../../../../components/base-modal";
 
 type EditProjectModalProps = {
     isOpen: boolean;
     project: ProjectWithInfo;
-    onSave: (id: number, name: string, description: string) => void;
+    onSave: (
+        id: number,
+        name: string,
+        description: string,
+        color: ProjectColor,
+    ) => void;
     onClose: () => void;
 };
 
@@ -17,17 +24,19 @@ export const EditProjectModal = ({
 }: EditProjectModalProps) => {
     const [name, setName] = useState(project.name);
     const [description, setDescription] = useState(project.description);
+    const [color, setColor] = useState<ProjectColor>(project.color);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (name.trim()) {
-            onSave(project.id, name.trim(), description.trim());
+            onSave(project.id, name.trim(), description.trim(), color);
         }
     };
 
     const handleClose = () => {
         setName(project.name);
         setDescription(project.description);
+        setColor(project.color);
         onClose();
     };
 
@@ -64,6 +73,8 @@ export const EditProjectModal = ({
                         placeholder="プロジェクトの説明（任意）"
                     />
                 </div>
+
+                <ColorPicker value={color} onChange={setColor} />
 
                 <div className="flex gap-3 pt-2">
                     <button

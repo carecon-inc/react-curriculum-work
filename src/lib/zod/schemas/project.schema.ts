@@ -1,4 +1,9 @@
+import { ProjectColor } from "@/generated/prisma/enums";
 import { z } from "zod";
+
+const projectColorEnum = z.enum(
+    Object.values(ProjectColor) as [ProjectColor, ...ProjectColor[]],
+);
 
 // プロジェクト作成バリデーションスキーマ
 export const createProjectSchema = z.object({
@@ -11,6 +16,7 @@ export const createProjectSchema = z.object({
         .max(1000, "説明は1000文字以内で入力してください")
         .optional()
         .default(""),
+    color: projectColorEnum,
 });
 
 // プロジェクト更新バリデーションスキーマ
@@ -28,6 +34,7 @@ export const updateProjectSchema = z.object({
         .max(1000, "説明は1000文字以内で入力してください")
         .optional()
         .default(""),
+    color: projectColorEnum,
 });
 
 // プロジェクト削除バリデーションスキーマ
