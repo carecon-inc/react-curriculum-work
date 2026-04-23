@@ -4,12 +4,15 @@ export type Tag = {
 };
 
 export type TaskStatus = "TODO" | "IN_PROGRESS" | "DONE";
+export type TaskPriority = "LOW" | "MEDIUM" | "HIGH";
 
 export type Task = {
     id: string;
     title: string;
-    description: string;
-    dueDate: string;
+    description?: string;
+    targetDate?: string;
+    dueDate?: string;
     status: TaskStatus;
+    priority?: TaskPriority;
     categories: string[];
 };

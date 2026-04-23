@@ -1,6 +1,6 @@
 "use client";
 
-import { Task } from "@/types/task";
+import { Task, TaskPriority } from "@/types/task";
 import { Trash2 } from "lucide-react";
 import { useState } from "react";
 import { BaseModal } from "../../../../components/base-modal";
@@ -24,6 +24,11 @@ export const TaskDetailModal = ({
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+
+        if (!editedTask.title.trim()) {
+            return;
+        }
+
         onSave(editedTask);
     };
 
@@ -33,16 +38,17 @@ export const TaskDetailModal = ({
                 <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                         タスク名
+                        <span className="text-red-500 ml-1">*</span>
                     </label>
                     <input
                         type="text"
                         value={editedTask.title}
-                        onChange={(e) =>
+                        onChange={(e) => {
                             setEditedTask({
                                 ...editedTask,
                                 title: e.target.value,
-                            })
-                        }
+                            });
+                        }}
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#009FE8] focus:border-transparent text-gray-900"
                         placeholder="タスクのタイトル"
                     />
@@ -68,23 +74,6 @@ export const TaskDetailModal = ({
 
                 <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                        期日
-                    </label>
-                    <input
-                        type="date"
-                        value={editedTask.dueDate}
-                        onChange={(e) =>
-                            setEditedTask({
-                                ...editedTask,
-                                dueDate: e.target.value,
-                            })
-                        }
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#009FE8] focus:border-transparent text-gray-900"
-                    />
-                </div>
-
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
                         ステータス
                     </label>
                     <select
@@ -103,6 +92,60 @@ export const TaskDetailModal = ({
                         <option value="TODO">未着手</option>
                         <option value="IN_PROGRESS">進行中</option>
                         <option value="DONE">完了</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                        実施予定日
+                    </label>
+                    <input
+                        type="date"
+                        value={editedTask.targetDate ?? ""}
+                        onChange={(e) =>
+                            setEditedTask({
+                                ...editedTask,
+                                targetDate: e.target.value || undefined,
+                            })
+                        }
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#009FE8] focus:border-transparent text-gray-900"
+                    />
+                </div>
+
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                        期日
+                    </label>
+                    <input
+                        type="date"
+                        value={editedTask.dueDate ?? ""}
+                        onChange={(e) =>
+                            setEditedTask({
+                                ...editedTask,
+                                dueDate: e.target.value || undefined,
+                            })
+                        }
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#009FE8] focus:border-transparent text-gray-900"
+                    />
+                </div>
+
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                        優先度
+                    </label>
+                    <select
+                        value={editedTask.priority ?? "MEDIUM"}
+                        onChange={(e) =>
+                            setEditedTask({
+                                ...editedTask,
+                                priority: e.target.value as TaskPriority,
+                            })
+                        }
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#009FE8] focus:border-transparent text-gray-900 bg-white"
+                    >
+                        <option value="LOW">低</option>
+                        <option value="MEDIUM">中</option>
+                        <option value="HIGH">高</option>
                     </select>
                 </div>
 
@@ -135,23 +178,26 @@ export const TaskDetailModal = ({
                         キャンセル
                     </button>
                     <button
+                        disabled={!editedTask.title.trim()}
                         type="submit"
-                        className="flex-1 px-4 py-2 bg-[#009FE8] text-white rounded-md hover:bg-[#0088cc] transition-colors"
+                        className="flex-1 px-4 py-2 bg-[#009FE8] text-white rounded-md hover:bg-[#0088cc] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         保存
                     </button>
                 </div>
 
-                <div className="pt-2 border-t border-gray-200">
-                    <button
-                        type="button"
-                        onClick={() => onDelete(editedTask.id)}
-                        className="w-full px-4 py-2 text-red-600 hover:bg-red-50 rounded-md transition-colors flex items-center justify-center gap-2"
-                    >
-                        <Trash2 className="w-4 h-4" />
-                        このタスクを削除
-                    </button>
-                </div>
+                {editedTask.id !== "" && (
+                    <div className="pt-2 border-t border-gray-200">
+                        <button
+                            type="button"
+                            onClick={() => onDelete(editedTask.id)}
+                            className="w-full px-4 py-2 text-red-600 hover:bg-red-50 rounded-md transition-colors flex items-center justify-center gap-2"
+                        >
+                            <Trash2 className="w-4 h-4" />
+                            このタスクを削除
+                        </button>
+                    </div>
+                )}
             </form>
         </BaseModal>
     );

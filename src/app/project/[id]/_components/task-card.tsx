@@ -1,5 +1,17 @@
-import { Task } from "@/types/task";
-import { BookOpen, Calendar } from "lucide-react";
+import { Task, TaskPriority } from "@/types/task";
+import { BookOpen, Calendar, Flag } from "lucide-react";
+
+const PRIORITY_LABEL: Record<TaskPriority, string> = {
+    LOW: "低",
+    MEDIUM: "中",
+    HIGH: "高",
+};
+
+const PRIORITY_COLOR: Record<TaskPriority, string> = {
+    LOW: "text-green-600",
+    MEDIUM: "text-yellow-600",
+    HIGH: "text-red-600",
+};
 
 type TaskCardProps = {
     task: Task;
@@ -14,7 +26,7 @@ export const TaskCard = ({ task, onClick }: TaskCardProps) => {
         >
             <div className="flex items-start gap-2">
                 <BookOpen className="w-4 h-4 mt-0.5 flex-shrink-0 text-gray-400" />
-                <span className="text-sm leading-relaxed text-gray-800">
+                <span className="text-sm leading-relaxed text-gray-800 line-clamp-2">
                     {task.title}
                 </span>
             </div>
@@ -30,10 +42,24 @@ export const TaskCard = ({ task, onClick }: TaskCardProps) => {
                     ))}
                 </div>
             )}
+            {task.targetDate && (
+                <div className="flex items-center gap-1 mt-2 ml-6 text-xs text-blue-500">
+                    <Calendar className="w-3 h-3" />
+                    実施日: {task.targetDate}
+                </div>
+            )}
             {task.dueDate && (
                 <div className="flex items-center gap-1 mt-2 ml-6 text-xs text-gray-500">
                     <Calendar className="w-3 h-3" />
-                    {task.dueDate}
+                    期日: {task.dueDate}
+                </div>
+            )}
+            {task.priority && (
+                <div
+                    className={`flex items-center gap-1 mt-2 ml-6 text-xs ${PRIORITY_COLOR[task.priority]}`}
+                >
+                    <Flag className="w-3 h-3" />
+                    優先度: {PRIORITY_LABEL[task.priority]}
                 </div>
             )}
         </div>
