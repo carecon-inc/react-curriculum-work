@@ -6,6 +6,7 @@ import { useState } from "react";
 
 type EditProjectModalProps = {
     isOpen: boolean;
+    isLoading?: boolean;
     project: ProjectWithInfo;
     onSave: (
         id: number,
@@ -18,6 +19,7 @@ type EditProjectModalProps = {
 
 export const EditProjectModal = ({
     isOpen,
+    isLoading = false,
     project,
     onSave,
     onClose,
@@ -86,10 +88,10 @@ export const EditProjectModal = ({
                     </button>
                     <button
                         type="submit"
-                        disabled={!name.trim()}
+                        disabled={!name.trim() || isLoading}
                         className="flex-1 px-4 py-2 bg-[#009FE8] text-white rounded-md hover:bg-[#0088cc] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                        保存
+                        {isLoading ? "保存中..." : "保存"}
                     </button>
                 </div>
             </form>

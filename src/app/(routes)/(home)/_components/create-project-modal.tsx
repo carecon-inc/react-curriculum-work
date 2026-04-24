@@ -5,12 +5,14 @@ import { useState } from "react";
 
 type CreateProjectModalProps = {
     isOpen: boolean;
+    isLoading?: boolean;
     onSave: (name: string, description: string, color: ProjectColor) => void;
     onClose: () => void;
 };
 
 export const CreateProjectModal = ({
     isOpen,
+    isLoading = false,
     onSave,
     onClose,
 }: CreateProjectModalProps) => {
@@ -81,10 +83,10 @@ export const CreateProjectModal = ({
                     </button>
                     <button
                         type="submit"
-                        disabled={!name.trim()}
+                        disabled={!name.trim() || isLoading}
                         className="flex-1 px-4 py-2 bg-[#009FE8] text-white rounded-md hover:bg-[#0088cc] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                        作成
+                        {isLoading ? "作成中..." : "作成"}
                     </button>
                 </div>
             </form>

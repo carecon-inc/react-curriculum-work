@@ -12,15 +12,14 @@ import {
 import { ProjectColor } from "@/generated/prisma/enums";
 import { ProjectWithInfo } from "@/types/project";
 import { Folder, Plus } from "lucide-react";
-import { useState } from "react";
+import { useState, useTransition } from "react";
 
 type Props = {
-    initialProjects: ProjectWithInfo[];
+    projects: ProjectWithInfo[];
 };
 
-export const ProjectList = ({ initialProjects }: Props) => {
-    const [projects, setProjects] =
-        useState<ProjectWithInfo[]>(initialProjects);
+export const ProjectList = ({ projects }: Props) => {
+    const [isPending, startTransition] = useTransition();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
     const [projectToDelete, setProjectToDelete] =
@@ -36,14 +35,15 @@ export const ProjectList = ({ initialProjects }: Props) => {
         description: string,
         color: ProjectColor,
     ) => {
-        try {
-            const newProject = await createProject(name, description, color);
-            setProjects((prev) => [newProject, ...prev]);
-            setIsModalOpen(false);
-        } catch (error) {
-            console.error("Failed to create project:", error);
-            alert("プロジェクトの作成に失敗しました。");
-        }
+        startTransition(async () => {
+            try {
+                await createProject(name, description, color);
+                setIsModalOpen(false);
+            } catch (error) {
+                console.error("Failed to create project:", error);
+                alert("プロジェクトの作成に失敗しました。");
+            }
+        });
     };
 
     // 編集ボタンクリック時に対象プロジェクトをセットして編集モーダルを開く関数
@@ -61,26 +61,16 @@ export const ProjectList = ({ initialProjects }: Props) => {
         description: string,
         color: ProjectColor,
     ) => {
-        try {
-            const updated = await updateProject(id, name, description, color);
-            setProjects((prev) =>
-                prev.map((p) =>
-                    p.id === updated.id
-                        ? {
-                              ...p,
-                              name: updated.name,
-                              description: updated.description,
-                              color: updated.color,
-                          }
-                        : p,
-                ),
-            );
-            setProjectToEdit(null);
-            setIsEditModalOpen(false);
-        } catch (error) {
-            console.error("Failed to update project:", error);
-            alert("プロジェクトの更新に失敗しました。");
-        }
+        startTransition(async () => {
+            try {
+                await updateProject(id, name, description, color);
+                setProjectToEdit(null);
+                setIsEditModalOpen(false);
+            } catch (error) {
+                console.error("Failed to update project:", error);
+                alert("プロジェクトの更新に失敗しました。");
+            }
+        });
     };
 
     // 削除ボタンクリック時に対象プロジェクトをセットして削除確認モーダルを開く関数
@@ -97,17 +87,16 @@ export const ProjectList = ({ initialProjects }: Props) => {
     // プロジェクトを削除する関数
     const handleConfirmDelete = async () => {
         if (projectToDelete) {
-            try {
-                await deleteProject(projectToDelete.id);
-                setProjects((prev) =>
-                    prev.filter((p) => p.id !== projectToDelete.id),
-                );
-                setProjectToDelete(null);
-                setIsDeleteConfirmOpen(false);
-            } catch (error) {
-                console.error("Failed to delete project:", error);
-                alert("プロジェクトの削除に失敗しました。");
-            }
+            startTransition(async () => {
+                try {
+                    await deleteProject(projectToDelete.id);
+                    setProjectToDelete(null);
+                    setIsDeleteConfirmOpen(false);
+                } catch (error) {
+                    console.error("Failed to delete project:", error);
+                    alert("プロジェクトの削除に失敗しました。");
+                }
+            });
         }
     };
 
@@ -133,7 +122,8 @@ export const ProjectList = ({ initialProjects }: Props) => {
                     </div>
                     <button
                         onClick={() => setIsModalOpen(true)}
-                        className="flex items-center gap-2 px-4 py-2 bg-[#009FE8] text-white rounded-lg hover:bg-[#0088cc] transition-colors font-medium"
+                        disabled={isPending}
+                        className="flex items-center gap-2 px-4 py-2 bg-[#009FE8] text-white rounded-lg hover:bg-[#0088cc] transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         <Plus className="w-5 h-5" />
                         新規プロジェクト
@@ -154,6 +144,7 @@ export const ProjectList = ({ initialProjects }: Props) => {
                     {/* 新しいプロジェクトカード */}
                     <button
                         onClick={() => setIsModalOpen(true)}
+                        disabled={isPending}
                         className="bg-white rounded-xl p-5 border-2 border-dashed border-gray-300 hover:border-[#009FE8] hover:bg-[#009FE8]/5 transition-all flex flex-col items-center justify-center min-h-[200px] group"
                     >
                         <div className="w-12 h-12 bg-gray-100 group-hover:bg-[#009FE8]/10 rounded-full flex items-center justify-center mb-3 transition-colors">
@@ -169,6 +160,7 @@ export const ProjectList = ({ initialProjects }: Props) => {
             {/* 新規プロジェクト作成モーダル */}
             <CreateProjectModal
                 isOpen={isModalOpen}
+                isLoading={isPending}
                 onSave={handleCreateProject}
                 onClose={() => setIsModalOpen(false)}
             />
@@ -176,6 +168,7 @@ export const ProjectList = ({ initialProjects }: Props) => {
             {/* プロジェクト削除確認モーダル */}
             <DeleteConfirmModal
                 isOpen={isDeleteConfirmOpen}
+                isLoading={isPending}
                 projectName={projectToDelete?.name || ""}
                 onConfirm={handleConfirmDelete}
                 onCancel={handleCancelDelete}
@@ -185,6 +178,7 @@ export const ProjectList = ({ initialProjects }: Props) => {
             {projectToEdit && (
                 <EditProjectModal
                     isOpen={isEditModalOpen}
+                    isLoading={isPending}
                     project={projectToEdit}
                     onSave={handleSaveEdit}
                     onClose={() => {

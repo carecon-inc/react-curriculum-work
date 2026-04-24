@@ -8,6 +8,7 @@ import {
     updateProjectSchema,
 } from "@/lib/zod/schemas/project.schema";
 import { ProjectWithInfo } from "@/types/project";
+import { revalidatePath } from "next/cache";
 
 /**
  * プロジェクトを全て取得する
@@ -61,35 +62,22 @@ export async function createProject(
     name: string,
     description: string,
     color: ProjectColor,
-): Promise<ProjectWithInfo> {
+): Promise<void> {
     const parsed = createProjectSchema.safeParse({ name, description, color });
 
     if (!parsed.success) {
         throw new Error(parsed.error.issues[0].message);
     }
 
-    const project = await prisma.project.create({
+    await prisma.project.create({
         data: {
             name: parsed.data.name,
             description: parsed.data.description,
             color: parsed.data.color,
         },
-        select: {
-            id: true,
-            name: true,
-            description: true,
-            color: true,
-        },
     });
 
-    return {
-        id: project.id,
-        name: project.name,
-        description: project.description ?? "",
-        taskCount: 0,
-        completedCount: 0,
-        color: project.color,
-    };
+    revalidatePath("/");
 }
 
 /**
@@ -105,12 +93,7 @@ export async function updateProject(
     name: string,
     description: string,
     color: ProjectColor,
-): Promise<{
-    id: number;
-    name: string;
-    description: string;
-    color: ProjectColor;
-}> {
+): Promise<void> {
     const parsed = updateProjectSchema.safeParse({
         id,
         name,
@@ -122,27 +105,16 @@ export async function updateProject(
         throw new Error(parsed.error.issues[0].message);
     }
 
-    const updatedProject = await prisma.project.update({
+    await prisma.project.update({
         where: { id: parsed.data.id },
         data: {
             name: parsed.data.name,
             description: parsed.data.description,
             color: parsed.data.color,
         },
-        select: {
-            id: true,
-            name: true,
-            description: true,
-            color: true,
-        },
     });
 
-    return {
-        id: updatedProject.id,
-        name: updatedProject.name,
-        description: updatedProject.description ?? "",
-        color: updatedProject.color,
-    };
+    revalidatePath("/");
 }
 
 /**
@@ -159,4 +131,6 @@ export async function deleteProject(id: number): Promise<void> {
     await prisma.project.delete({
         where: { id: parsed.data.id },
     });
+
+    revalidatePath("/");
 }

@@ -3,6 +3,7 @@ import { BaseModal } from "../../../../components/base-modal";
 
 type DeleteConfirmModalProps = {
     isOpen: boolean;
+    isLoading?: boolean;
     projectName: string;
     onConfirm: () => void;
     onCancel: () => void;
@@ -10,6 +11,7 @@ type DeleteConfirmModalProps = {
 
 export const DeleteConfirmModal = ({
     isOpen,
+    isLoading = false,
     projectName,
     onConfirm,
     onCancel,
@@ -36,9 +38,10 @@ export const DeleteConfirmModal = ({
                 <div className="flex gap-3 pt-2">
                     <button
                         onClick={onConfirm}
-                        className="flex-1 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
+                        disabled={isLoading}
+                        className="flex-1 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                        削除
+                        {isLoading ? "削除中..." : "削除"}
                     </button>
                     <button
                         onClick={onCancel}

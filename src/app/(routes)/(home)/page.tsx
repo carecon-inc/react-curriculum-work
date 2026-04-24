@@ -3,5 +3,5 @@ import { getProjects } from "@/app/(routes)/(home)/action";
 
 export default async function Home() {
     const projects = await getProjects();
-    return <ProjectList initialProjects={projects} />;
+    return <ProjectList projects={projects} />;
 }
