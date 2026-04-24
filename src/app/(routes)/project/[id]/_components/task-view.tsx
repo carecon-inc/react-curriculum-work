@@ -21,7 +21,7 @@ type Props = {
     initialTasks: Task[];
 };
 
-type ViewTab = "status" | "gallery" | "all";
+type ViewTab = "status";
 
 export function TaskView({ projectId, projectName, initialTasks }: Props) {
     const [tasks, setTasks] = useState<Task[]>(initialTasks);
