@@ -10,14 +10,6 @@ import {
 } from "@/lib/zod/schemas/task.schema";
 import { Task } from "@/types/task";
 
-const PROJECT_COLORS = [
-    "bg-[#009FE8]",
-    "bg-[#EC7426]",
-    "bg-emerald-500",
-    "bg-purple-500",
-    "bg-pink-500",
-];
-
 /**
  * 指定プロジェクトの名前を取得する
  * @param id プロジェクトID
@@ -105,6 +97,7 @@ export async function createTask(
         dueDate?: string;
         priority?: Task["priority"];
         status?: Task["status"];
+        categories?: string[];
     },
 ): Promise<Task> {
     const parsed = createTaskSchema.safeParse({ projectId, title, ...data });
@@ -112,6 +105,8 @@ export async function createTask(
     if (!parsed.success) {
         throw new Error(parsed.error.issues[0].message);
     }
+
+    const categoryIds = await getCategoryIds(parsed.data.categories);
 
     const task = await prisma.task.create({
         data: {
@@ -126,6 +121,14 @@ export async function createTask(
                 : undefined,
             priority: parsed.data.priority,
             status: parsed.data.status,
+            taskCategories:
+                categoryIds.length > 0
+                    ? {
+                          create: categoryIds.map((categoryId) => ({
+                              categoryId,
+                          })),
+                      }
+                    : undefined,
         },
         select: {
             id: true,
@@ -135,6 +138,11 @@ export async function createTask(
             dueDate: true,
             priority: true,
             status: true,
+            taskCategories: {
+                select: {
+                    category: { select: { name: true } },
+                },
+            },
         },
     });
 
@@ -150,7 +158,7 @@ export async function createTask(
             : undefined,
         priority: task.priority as Task["priority"],
         status: task.status as Task["status"],
-        categories: [],
+        categories: task.taskCategories.map((tc) => tc.category.name),
     };
 }
 
@@ -169,6 +177,7 @@ export async function updateTask(
         dueDate?: string;
         priority?: Task["priority"];
         status: Task["status"];
+        categories?: string[];
     },
 ): Promise<{ task: Task; allCompleted: boolean }> {
     const parsed = updateTaskSchema.safeParse({ id, ...data });
@@ -176,6 +185,8 @@ export async function updateTask(
     if (!parsed.success) {
         throw new Error(parsed.error.issues[0].message);
     }
+
+    const categoryIds = await getCategoryIds(parsed.data.categories);
 
     const task = await prisma.task.update({
         where: { id: parsed.data.id },
@@ -188,6 +199,10 @@ export async function updateTask(
             dueDate: parsed.data.dueDate ? new Date(parsed.data.dueDate) : null,
             priority: parsed.data.priority,
             status: parsed.data.status,
+            taskCategories: {
+                deleteMany: {},
+                create: categoryIds.map((categoryId) => ({ categoryId })),
+            },
         },
         select: {
             id: true,
@@ -259,3 +274,43 @@ export async function getAdvice(): Promise<string> {
     const data: { slip: { id: number; advice: string } } = await res.json();
     return data.slip.advice;
 }
+
+// カテゴリ名の配列を重複を排除する関数
+const normalizeCategories = (categories?: string[]) => [
+    ...new Set((categories ?? []).map((name) => name.trim()).filter(Boolean)),
+];
+
+/**
+ * カテゴリ名の配列から既存カテゴリを照合し、存在しないカテゴリは新規作成してIDの配列を返す
+ * @param categories カテゴリ名の配列
+ * @returns カテゴリIDの配列
+ */
+const getCategoryIds = async (categories?: string[]): Promise<number[]> => {
+    const normalized = normalizeCategories(categories);
+    if (normalized.length === 0) return [];
+
+    const existing = await prisma.category.findMany({
+        where: { name: { in: normalized } },
+        select: { id: true, name: true },
+    });
+
+    const existingNameSet = new Set(existing.map((c) => c.name));
+    const missingNames = normalized.filter(
+        (name) => !existingNameSet.has(name),
+    );
+
+    if (missingNames.length === 0) {
+        return existing.map((c) => c.id);
+    }
+
+    const created = await Promise.all(
+        missingNames.map((name) =>
+            prisma.category.create({
+                data: { name },
+                select: { id: true },
+            }),
+        ),
+    );
+
+    return [...existing.map((c) => c.id), ...created.map((c) => c.id)];
+};

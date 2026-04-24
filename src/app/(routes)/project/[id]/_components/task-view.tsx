@@ -50,9 +50,20 @@ export function TaskView({ projectId, projectName, initialTasks }: Props) {
         setIsModalOpen(true);
     };
 
+    // カテゴリ入力を整形する関数（全角・半角のカンマを区切り文字として使用）
+    const normalizeCategoriesForRequest = (categories: string[]) =>
+        categories
+            .flatMap((category) => category.split(/[、,]/))
+            .map((category) => category.trim())
+            .filter((category) => category.length > 0);
+
     // タスクを保存（新規作成 / 更新）する関数
     const handleSaveTask = async (updatedTask: Task) => {
         try {
+            const normalizedCategories = normalizeCategoriesForRequest(
+                updatedTask.categories,
+            );
+
             if (updatedTask.id === "") {
                 // 新規作成
                 const created = await createTask(projectId, updatedTask.title, {
@@ -61,6 +72,7 @@ export function TaskView({ projectId, projectName, initialTasks }: Props) {
                     dueDate: updatedTask.dueDate,
                     priority: updatedTask.priority,
                     status: updatedTask.status,
+                    categories: normalizedCategories,
                 });
                 setTasks((prev) => [...prev, created]);
             } else {
@@ -74,6 +86,7 @@ export function TaskView({ projectId, projectName, initialTasks }: Props) {
                         dueDate: updatedTask.dueDate,
                         priority: updatedTask.priority,
                         status: updatedTask.status,
+                        categories: normalizedCategories,
                     },
                 );
                 setTasks((prev) =>
