@@ -6,6 +6,7 @@ export const getTasksSchema = z.object({
         .number()
         .int()
         .positive("プロジェクトIDは正の整数である必要があります"),
+    keyword: z.string().optional(),
 });
 
 // タスク新規作成バリデーションスキーマ

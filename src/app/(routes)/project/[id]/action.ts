@@ -37,15 +37,23 @@ export async function getProjectName(
  * @param projectId プロジェクトID
  * @returns タスクの配列
  */
-export async function getTasks(projectId: number): Promise<Task[]> {
-    const parsed = getTasksSchema.safeParse({ projectId });
+export async function getTasks(
+    projectId: number,
+    keyword?: string,
+): Promise<Task[]> {
+    const parsed = getTasksSchema.safeParse({ projectId, keyword });
 
     if (!parsed.success) {
         throw new Error(parsed.error.issues[0].message);
     }
 
+    const trimmedKeyword = parsed.data.keyword?.trim();
+
     const tasks = await prisma.task.findMany({
-        where: { projectId: parsed.data.projectId },
+        where: {
+            projectId: parsed.data.projectId,
+            ...(trimmedKeyword ? { title: { contains: trimmedKeyword } } : {}),
+        },
         orderBy: { createdAt: "asc" },
         select: {
             id: true,

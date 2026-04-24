@@ -3,15 +3,17 @@ import { TaskView } from "./_components/task-view";
 
 type Props = {
     params: Promise<{ id: string }>;
+    searchParams: Promise<{ search?: string }>;
 };
 
-export default async function ProjectDetail({ params }: Props) {
+export default async function ProjectDetail({ params, searchParams }: Props) {
     const { id } = await params;
+    const { search } = await searchParams;
     const projectId = Number(id);
 
     const [project, tasks] = await Promise.all([
         getProjectName(projectId),
-        getTasks(projectId),
+        getTasks(projectId, search),
     ]);
 
     return (
@@ -19,6 +21,7 @@ export default async function ProjectDetail({ params }: Props) {
             projectId={projectId}
             projectName={project.name}
             initialTasks={tasks}
+            searchKeyword={search ?? ""}
         />
     );
 }

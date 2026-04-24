@@ -9,8 +9,9 @@ import {
 import { BackHome } from "@/components/back-home";
 import { apiFetch } from "@/lib/api-client";
 import { Task, TaskStatus } from "@/types/task";
-import { Download, ListTodo, Table } from "lucide-react";
-import { useState } from "react";
+import { Download, ListTodo, Search, Table } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 import { CompletedModal } from "./completed-modal";
 import { KanbanBoard } from "./kanban-board";
 import { TaskDetailModal } from "./task-detail-modal";
@@ -19,17 +20,51 @@ type Props = {
     projectId: number;
     projectName: string;
     initialTasks: Task[];
+    searchKeyword: string;
 };
 
 type ViewTab = "status";
 
-export function TaskView({ projectId, projectName, initialTasks }: Props) {
+export function TaskView({
+    projectId,
+    projectName,
+    initialTasks,
+    searchKeyword,
+}: Props) {
+    const router = useRouter();
     const [tasks, setTasks] = useState<Task[]>(initialTasks);
     const [activeTab, setActiveTab] = useState<ViewTab>("status");
     const [selectedTask, setSelectedTask] = useState<Task | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isDownloading, setIsDownloading] = useState(false);
     const [advice, setAdvice] = useState<string | null>(null);
+    const [searchInput, setSearchInput] = useState(searchKeyword);
+    const isFirstRender = useRef(true); // 初回レンダリングを判定するフラグ
+
+    // 再レンダリング時にtasksを同期する
+    useEffect(() => {
+        setTasks(initialTasks);
+    }, [initialTasks]);
+
+    // searchInputが変更されたときにURLのクエリパラメータを更新する関数
+    useEffect(() => {
+        /// 初回レンダリング時はスキップ
+        if (isFirstRender.current) {
+            isFirstRender.current = false;
+            return;
+        }
+
+        // デバウンス処理
+        const timer = setTimeout(() => {
+            const params = new URLSearchParams();
+            if (searchInput.trim()) {
+                params.set("search", searchInput.trim());
+            }
+            router.replace(`/project/${projectId}?${params.toString()}`);
+        }, 500);
+
+        return () => clearTimeout(timer);
+    }, [searchInput, projectId, router]);
 
     // New itemボタンクリック時にモーダルを開く関数
     const handleAddItem = (status: TaskStatus) => {
@@ -162,19 +197,32 @@ export function TaskView({ projectId, projectName, initialTasks }: Props) {
 
             {/* Menu Bar */}
             <div className="flex items-center justify-between mb-6 border-b border-gray-200 pb-2">
-                {/* Tabs */}
-                <div className="flex items-center gap-1">
-                    <button
-                        onClick={() => setActiveTab("status")}
-                        className={`flex items-center gap-2 px-3 py-1.5 rounded text-sm transition-colors ${
-                            activeTab === "status"
-                                ? "bg-[#009FE8] text-white"
-                                : "text-gray-600 hover:bg-gray-100"
-                        }`}
-                    >
-                        <Table className="w-4 h-4" />
-                        ステータス別
-                    </button>
+                <div className="flex items-center gap-3">
+                    {/* Tabs */}
+                    <div className="flex items-center gap-1">
+                        <button
+                            onClick={() => setActiveTab("status")}
+                            className={`flex items-center gap-2 px-3 py-1.5 rounded text-sm transition-colors ${
+                                activeTab === "status"
+                                    ? "bg-[#009FE8] text-white"
+                                    : "text-gray-600 hover:bg-gray-100"
+                            }`}
+                        >
+                            <Table className="w-4 h-4" />
+                            ステータス別
+                        </button>
+                    </div>
+                    {/* Search Bar */}
+                    <div className="relative">
+                        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                        <input
+                            type="text"
+                            value={searchInput}
+                            onChange={(e) => setSearchInput(e.target.value)}
+                            placeholder="タスク名で検索..."
+                            className="pl-8 pr-3 py-1.5 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#009FE8] focus:border-transparent w-56"
+                        />
+                    </div>
                 </div>
                 {/* CSV Download */}
                 <button
