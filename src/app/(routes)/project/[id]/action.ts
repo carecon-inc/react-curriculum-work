@@ -170,6 +170,12 @@ export async function updateTask(
 
     const categoryIds = await getCategoryIds(parsed.data.categories);
 
+    // 更新前のステータスを取得（DONE への遷移かどうかを判定するため）
+    const beforeTask = await prisma.task.findUniqueOrThrow({
+        where: { id: parsed.data.id },
+        select: { status: true, projectId: true },
+    });
+
     const task = await prisma.task.update({
         where: { id: parsed.data.id },
         data: {
@@ -190,6 +196,15 @@ export async function updateTask(
             projectId: true,
         },
     });
+
+    // DONE への遷移が発生した場合のみ全完了チェックを行う
+    const justBecameDone =
+        beforeTask.status !== "DONE" && parsed.data.status === "DONE";
+
+    if (!justBecameDone) {
+        revalidatePath(`/project/${task.projectId}`);
+        return { allCompleted: false };
+    }
 
     // 同プロジェクト内の未完了タスク数を確認
     const incompleteCount = await prisma.task.count({
