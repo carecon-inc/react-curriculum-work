@@ -1,9 +1,11 @@
 "use client";
 
+import { BaseModal } from "@/components/base-modal";
+import { PrimaryButton } from "@/components/primary-button";
+import { SecondaryButton } from "@/components/secondary-button";
 import { Task, TaskPriority } from "@/types/task";
 import { Trash2 } from "lucide-react";
 import { useState } from "react";
-import { BaseModal } from "../../../../../components/base-modal";
 
 type TaskDetailModalProps = {
     isOpen: boolean;
@@ -172,21 +174,21 @@ export const TaskDetailModal = ({
                 </div>
 
                 <div className="flex gap-3 pt-2">
-                    <button
+                    <SecondaryButton
                         disabled={isLoading}
                         type="button"
                         onClick={onClose}
-                        className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="flex-1"
                     >
                         キャンセル
-                    </button>
-                    <button
+                    </SecondaryButton>
+                    <PrimaryButton
                         disabled={!editedTask.title.trim() || isLoading}
                         type="submit"
-                        className="flex-1 px-4 py-2 bg-[#009FE8] text-white rounded-md hover:bg-[#0088cc] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="flex-1"
                     >
                         {isLoading ? "保存中..." : "保存"}
-                    </button>
+                    </PrimaryButton>
                 </div>
 
                 {editedTask.id !== "" && (

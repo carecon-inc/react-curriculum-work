@@ -1,5 +1,7 @@
 import { BaseModal } from "@/components/base-modal";
 import { ColorPicker } from "@/components/color-picker";
+import { PrimaryButton } from "@/components/primary-button";
+import { SecondaryButton } from "@/components/secondary-button";
 import { ProjectColor } from "@/generated/prisma/enums";
 import { ProjectWithInfo } from "@/types/project";
 import { useState } from "react";
@@ -79,20 +81,20 @@ export const EditProjectModal = ({
                 <ColorPicker value={color} onChange={setColor} />
 
                 <div className="flex gap-3 pt-2">
-                    <button
+                    <SecondaryButton
                         type="button"
                         onClick={handleClose}
-                        className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors"
+                        className="flex-1"
                     >
                         キャンセル
-                    </button>
-                    <button
+                    </SecondaryButton>
+                    <PrimaryButton
                         type="submit"
                         disabled={!name.trim() || isLoading}
-                        className="flex-1 px-4 py-2 bg-[#009FE8] text-white rounded-md hover:bg-[#0088cc] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="flex-1"
                     >
                         {isLoading ? "保存中..." : "保存"}
-                    </button>
+                    </PrimaryButton>
                 </div>
             </form>
         </BaseModal>

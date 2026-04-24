@@ -1,5 +1,6 @@
+import { BaseModal } from "@/components/base-modal";
+import { SecondaryButton } from "@/components/secondary-button";
 import { Trash2 } from "lucide-react";
-import { BaseModal } from "../../../../components/base-modal";
 
 type DeleteConfirmModalProps = {
     isOpen: boolean;
@@ -43,12 +44,9 @@ export const DeleteConfirmModal = ({
                     >
                         {isLoading ? "削除中..." : "削除"}
                     </button>
-                    <button
-                        onClick={onCancel}
-                        className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors"
-                    >
+                    <SecondaryButton onClick={onCancel} className="flex-1">
                         キャンセル
-                    </button>
+                    </SecondaryButton>
                 </div>
             </div>
         </BaseModal>
