@@ -9,6 +9,7 @@ import {
     updateTaskSchema,
 } from "@/lib/zod/schemas/task.schema";
 import { Task } from "@/types/task";
+import { revalidatePath } from "next/cache";
 
 /**
  * 指定プロジェクトの名前を取得する
@@ -107,7 +108,7 @@ export async function createTask(
         status?: Task["status"];
         categories?: string[];
     },
-): Promise<Task> {
+): Promise<void> {
     const parsed = createTaskSchema.safeParse({ projectId, title, ...data });
 
     if (!parsed.success) {
@@ -116,7 +117,7 @@ export async function createTask(
 
     const categoryIds = await getCategoryIds(parsed.data.categories);
 
-    const task = await prisma.task.create({
+    await prisma.task.create({
         data: {
             projectId: parsed.data.projectId,
             title: parsed.data.title,
@@ -138,36 +139,9 @@ export async function createTask(
                       }
                     : undefined,
         },
-        select: {
-            id: true,
-            title: true,
-            description: true,
-            targetDate: true,
-            dueDate: true,
-            priority: true,
-            status: true,
-            taskCategories: {
-                select: {
-                    category: { select: { name: true } },
-                },
-            },
-        },
     });
 
-    return {
-        id: task.id.toString(),
-        title: task.title,
-        description: task.description ?? "",
-        targetDate: task.targetDate
-            ? task.targetDate.toISOString().split("T")[0]
-            : undefined,
-        dueDate: task.dueDate
-            ? task.dueDate.toISOString().split("T")[0]
-            : undefined,
-        priority: task.priority as Task["priority"],
-        status: task.status as Task["status"],
-        categories: task.taskCategories.map((tc) => tc.category.name),
-    };
+    revalidatePath(`/project/${parsed.data.projectId}`);
 }
 
 /**
@@ -187,7 +161,7 @@ export async function updateTask(
         status: Task["status"];
         categories?: string[];
     },
-): Promise<{ task: Task; allCompleted: boolean }> {
+): Promise<{ allCompleted: boolean }> {
     const parsed = updateTaskSchema.safeParse({ id, ...data });
 
     if (!parsed.success) {
@@ -213,19 +187,7 @@ export async function updateTask(
             },
         },
         select: {
-            id: true,
-            title: true,
-            description: true,
-            targetDate: true,
-            dueDate: true,
-            priority: true,
-            status: true,
             projectId: true,
-            taskCategories: {
-                select: {
-                    category: { select: { name: true } },
-                },
-            },
         },
     });
 
@@ -237,23 +199,8 @@ export async function updateTask(
         },
     });
 
-    return {
-        task: {
-            id: task.id.toString(),
-            title: task.title,
-            description: task.description ?? "",
-            targetDate: task.targetDate
-                ? task.targetDate.toISOString().split("T")[0]
-                : undefined,
-            dueDate: task.dueDate
-                ? task.dueDate.toISOString().split("T")[0]
-                : undefined,
-            priority: task.priority as Task["priority"],
-            status: task.status as Task["status"],
-            categories: task.taskCategories.map((tc) => tc.category.name),
-        },
-        allCompleted: incompleteCount === 0,
-    };
+    revalidatePath(`/project/${task.projectId}`);
+    return { allCompleted: incompleteCount === 0 };
 }
 
 /**
@@ -267,9 +214,20 @@ export async function deleteTask(id: number): Promise<void> {
         throw new Error(parsed.error.issues[0].message);
     }
 
+    const task = await prisma.task.findUniqueOrThrow({
+        where: { id: parsed.data.id },
+        select: { projectId: true },
+    });
+
+    if (!task) {
+        throw new Error("タスクが見つかりません");
+    }
+
     await prisma.task.delete({
         where: { id: parsed.data.id },
     });
+
+    revalidatePath(`/project/${task.projectId}`);
 }
 
 /**

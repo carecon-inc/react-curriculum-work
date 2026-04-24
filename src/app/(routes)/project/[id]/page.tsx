@@ -20,7 +20,7 @@ export default async function ProjectDetail({ params, searchParams }: Props) {
         <TaskView
             projectId={projectId}
             projectName={project.name}
-            initialTasks={tasks}
+            tasks={tasks}
             searchKeyword={search ?? ""}
         />
     );

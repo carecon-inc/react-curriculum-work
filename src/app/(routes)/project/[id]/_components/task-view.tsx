@@ -11,7 +11,7 @@ import { apiFetch } from "@/lib/api-client";
 import { Task, TaskStatus } from "@/types/task";
 import { Download, ListTodo, Search, Table } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { CompletedModal } from "./completed-modal";
 import { KanbanBoard } from "./kanban-board";
 import { TaskDetailModal } from "./task-detail-modal";
@@ -19,32 +19,24 @@ import { TaskDetailModal } from "./task-detail-modal";
 type Props = {
     projectId: number;
     projectName: string;
-    initialTasks: Task[];
+    tasks: Task[];
     searchKeyword: string;
 };
-
-type ViewTab = "status";
 
 export function TaskView({
     projectId,
     projectName,
-    initialTasks,
+    tasks,
     searchKeyword,
 }: Props) {
     const router = useRouter();
-    const [tasks, setTasks] = useState<Task[]>(initialTasks);
-    const [activeTab, setActiveTab] = useState<ViewTab>("status");
     const [selectedTask, setSelectedTask] = useState<Task | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isDownloading, setIsDownloading] = useState(false);
     const [advice, setAdvice] = useState<string | null>(null);
     const [searchInput, setSearchInput] = useState(searchKeyword);
     const isFirstRender = useRef(true); // 初回レンダリングを判定するフラグ
-
-    // 再レンダリング時にtasksを同期する
-    useEffect(() => {
-        setTasks(initialTasks);
-    }, [initialTasks]);
+    const [isPending, startTransition] = useTransition();
 
     // searchInputが変更されたときにURLのクエリパラメータを更新する関数
     useEffect(() => {
@@ -93,51 +85,49 @@ export function TaskView({
             .filter((category) => category.length > 0);
 
     // タスクを保存（新規作成 / 更新）する関数
-    const handleSaveTask = async (updatedTask: Task) => {
-        try {
-            const normalizedCategories = normalizeCategoriesForRequest(
-                updatedTask.categories,
-            );
+    const handleSaveTask = (updatedTask: Task) => {
+        startTransition(async () => {
+            try {
+                const normalizedCategories = normalizeCategoriesForRequest(
+                    updatedTask.categories,
+                );
 
-            if (updatedTask.id === "") {
-                // 新規作成
-                const created = await createTask(projectId, updatedTask.title, {
-                    description: updatedTask.description,
-                    targetDate: updatedTask.targetDate,
-                    dueDate: updatedTask.dueDate,
-                    priority: updatedTask.priority,
-                    status: updatedTask.status,
-                    categories: normalizedCategories,
-                });
-                setTasks((prev) => [...prev, created]);
-            } else {
-                // 更新
-                const { task: saved, allCompleted } = await updateTask(
-                    Number(updatedTask.id),
-                    {
-                        title: updatedTask.title,
+                if (updatedTask.id === "") {
+                    // 新規作成
+                    await createTask(projectId, updatedTask.title, {
                         description: updatedTask.description,
                         targetDate: updatedTask.targetDate,
                         dueDate: updatedTask.dueDate,
                         priority: updatedTask.priority,
                         status: updatedTask.status,
                         categories: normalizedCategories,
-                    },
-                );
-                setTasks((prev) =>
-                    prev.map((task) => (task.id === saved.id ? saved : task)),
-                );
-                if (allCompleted) {
-                    const fetchedAdvice = await getAdvice();
-                    setAdvice(fetchedAdvice);
+                    });
+                } else {
+                    // 更新
+                    const { allCompleted } = await updateTask(
+                        Number(updatedTask.id),
+                        {
+                            title: updatedTask.title,
+                            description: updatedTask.description,
+                            targetDate: updatedTask.targetDate,
+                            dueDate: updatedTask.dueDate,
+                            priority: updatedTask.priority,
+                            status: updatedTask.status,
+                            categories: normalizedCategories,
+                        },
+                    );
+                    if (allCompleted) {
+                        const fetchedAdvice = await getAdvice();
+                        setAdvice(fetchedAdvice);
+                    }
                 }
+                setIsModalOpen(false);
+                setSelectedTask(null);
+            } catch (error) {
+                console.error("Failed to save task:", error);
+                alert("タスクの保存に失敗しました。");
             }
-            setIsModalOpen(false);
-            setSelectedTask(null);
-        } catch (error) {
-            console.error("Failed to save task:", error);
-            alert("タスクの保存に失敗しました。");
-        }
+        });
     };
 
     // モーダルを閉じる関数
@@ -147,16 +137,17 @@ export function TaskView({
     };
 
     // タスクを削除する関数
-    const handleDeleteTask = async (taskId: string) => {
-        try {
-            await deleteTask(Number(taskId));
-            setTasks((prev) => prev.filter((task) => task.id !== taskId));
-            setIsModalOpen(false);
-            setSelectedTask(null);
-        } catch (error) {
-            console.error("Failed to delete task:", error);
-            alert("タスクの削除に失敗しました。");
-        }
+    const handleDeleteTask = (taskId: string) => {
+        startTransition(async () => {
+            try {
+                await deleteTask(Number(taskId));
+                setIsModalOpen(false);
+                setSelectedTask(null);
+            } catch (error) {
+                console.error("Failed to delete task:", error);
+                alert("タスクの削除に失敗しました。");
+            }
+        });
     };
 
     // CSVダウンロード関数
@@ -200,14 +191,7 @@ export function TaskView({
                 <div className="flex items-center gap-3">
                     {/* Tabs */}
                     <div className="flex items-center gap-1">
-                        <button
-                            onClick={() => setActiveTab("status")}
-                            className={`flex items-center gap-2 px-3 py-1.5 rounded text-sm transition-colors ${
-                                activeTab === "status"
-                                    ? "bg-[#009FE8] text-white"
-                                    : "text-gray-600 hover:bg-gray-100"
-                            }`}
-                        >
+                        <button className="flex items-center gap-2 px-3 py-1.5 rounded text-sm transition-colors bg-[#009FE8] text-white">
                             <Table className="w-4 h-4" />
                             ステータス別
                         </button>
@@ -246,6 +230,7 @@ export function TaskView({
             {isModalOpen && selectedTask && (
                 <TaskDetailModal
                     isOpen={isModalOpen}
+                    isLoading={isPending}
                     task={selectedTask}
                     onSave={handleSaveTask}
                     onClose={handleCloseModal}
