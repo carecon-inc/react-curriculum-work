@@ -121,7 +121,7 @@ export const ProjectList = ({ initialProjects }: Props) => {
         <div className="min-h-screen bg-gray-50 text-gray-900 p-6">
             <div className="max-w-5xl mx-auto">
                 {/* ヘッドコンテンツ */}
-                <div className="flex items-center justify-between mb-8">
+                <div className="mb-8 flex flex-col items-start gap-4 md:flex-row md:items-center md:justify-between">
                     <div>
                         <h1 className="text-2xl font-bold flex items-center gap-2 text-gray-900">
                             <Folder className="w-7 h-7 text-[#009FE8]" />

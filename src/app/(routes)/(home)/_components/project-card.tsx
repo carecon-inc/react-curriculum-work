@@ -68,7 +68,7 @@ export const ProjectCard = ({
                             e.stopPropagation();
                             setIsMenuOpen((prev) => !prev);
                         }}
-                        className="opacity-0 group-hover:opacity-100 p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded transition-all"
+                        className="opacity-100 lg:opacity-0 lg:group-hover:opacity-100 p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded transition-all"
                         title="メニュー"
                     >
                         <MoreVertical className="w-4 h-4" />
