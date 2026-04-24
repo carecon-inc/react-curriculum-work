@@ -98,8 +98,6 @@ docker compose exec app npm run db:studio
 
 ## 📝 Prismaスキーマを更新する場合
 
-> カリキュラムのワークでスキーマを変更する必要はありません。補足的に記載しています。
-
 #### 1. `prisma/schema.prisma` を編集する
 
 #### 2. マイグレーションを実行する
