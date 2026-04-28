@@ -2,6 +2,7 @@
 
 import { apiFetch } from "@/lib/api-client";
 import { prisma } from "@/lib/prisma";
+import { getProjectByIdSchema } from "@/lib/zod/schemas/project.schema";
 import {
     createTaskSchema,
     deleteTaskSchema,
@@ -19,6 +20,12 @@ import { revalidatePath } from "next/cache";
 export async function getProjectName(
     id: number,
 ): Promise<{ id: number; name: string }> {
+    const parsed = getProjectByIdSchema.safeParse({ id });
+
+    if (!parsed.success) {
+        throw new Error(parsed.error.issues[0].message);
+    }
+
     const project = await prisma.project.findUniqueOrThrow({
         where: { id },
         select: {

@@ -44,3 +44,11 @@ export const deleteProjectSchema = z.object({
         .int()
         .positive("プロジェクトIDは正の整数である必要があります"),
 });
+
+// 指定したIDのプロジェクトを取得するバリデーションスキーマ
+export const getProjectByIdSchema = z.object({
+    id: z
+        .number()
+        .int()
+        .positive("プロジェクトIDは正の整数である必要があります"),
+});

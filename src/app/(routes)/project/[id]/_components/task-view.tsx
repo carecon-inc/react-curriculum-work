@@ -125,7 +125,9 @@ export function TaskView({
                 setSelectedTask(null);
             } catch (error) {
                 console.error("Failed to save task:", error);
-                alert("タスクの保存に失敗しました。");
+                alert(
+                    `タスクの保存に失敗しました。: ${error instanceof Error ? error.message : ""}`,
+                );
             }
         });
     };
@@ -145,7 +147,9 @@ export function TaskView({
                 setSelectedTask(null);
             } catch (error) {
                 console.error("Failed to delete task:", error);
-                alert("タスクの削除に失敗しました。");
+                alert(
+                    `タスクの削除に失敗しました。: ${error instanceof Error ? error.message : ""}`,
+                );
             }
         });
     };
@@ -166,9 +170,7 @@ export function TaskView({
             URL.revokeObjectURL(url);
         } catch (error) {
             alert(
-                error instanceof Error
-                    ? error.message
-                    : "CSVのダウンロードに失敗しました。",
+                `CSVのダウンロードに失敗しました。: ${error instanceof Error ? error.message : ""}`,
             );
         } finally {
             setIsDownloading(false);

@@ -24,7 +24,14 @@ export const createTaskSchema = z.object({
     dueDate: z.string().optional(),
     priority: z.enum(["LOW", "MEDIUM", "HIGH"]).optional(),
     status: z.enum(["TODO", "IN_PROGRESS", "DONE"]).optional(),
-    categories: z.array(z.string().min(1).max(30)).optional(),
+    categories: z
+        .array(
+            z
+                .string()
+                .min(1, "カテゴリは1文字以上で入力してください")
+                .max(30, "カテゴリは30文字以内で入力してください"),
+        )
+        .optional(),
 });
 
 // タスク更新バリデーションスキーマ
@@ -39,7 +46,14 @@ export const updateTaskSchema = z.object({
     dueDate: z.string().optional(),
     priority: z.enum(["LOW", "MEDIUM", "HIGH"]).optional(),
     status: z.enum(["TODO", "IN_PROGRESS", "DONE"]),
-    categories: z.array(z.string().min(1).max(30)).optional(),
+    categories: z
+        .array(
+            z
+                .string()
+                .min(1, "カテゴリは1文字以上で入力してください")
+                .max(30, "カテゴリは30文字以内で入力してください"),
+        )
+        .optional(),
 });
 
 // タスク削除バリデーションスキーマ
