@@ -2,18 +2,18 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "タスク管理アプリ",
-  description: "Next.js + Prisma で作るタスク管理アプリ",
+    title: "Simple Message Board",
+    description: "Next.js で作る簡易掲示板アプリ",
 };
 
 export default function RootLayout({
-  children,
+    children,
 }: {
-  children: React.ReactNode;
+    children: React.ReactNode;
 }) {
-  return (
-    <html lang="ja">
-      <body>{children}</body>
-    </html>
-  );
+    return (
+        <html lang="ja">
+            <body>{children}</body>
+        </html>
+    );
 }

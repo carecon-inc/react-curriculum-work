@@ -1,8 +1,17 @@
-export default function Home() {
-  return (
-    <main className="min-h-screen p-8">
-      <h1 className="text-2xl font-bold">タスク管理アプリ</h1>
-      <p className="mt-2 text-gray-600">環境構築が完了しました。</p>
-    </main>
-  );
+import MessageBoard from "@/components/MessageBoard";
+import { getMessages } from "./actions/message";
+
+export default async function Home() {
+    const messages = await getMessages();
+
+    return (
+        <main className="min-h-screen bg-gray-100 p-8">
+            <div className="max-w-2xl mx-auto">
+                <h1 className="text-3xl font-bold mb-8 text-center">
+                    Simple Message Board
+                </h1>
+                <MessageBoard initialMessages={messages} />
+            </div>
+        </main>
+    );
 }
