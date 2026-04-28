@@ -1,5 +1,3 @@
-"use server";
-
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
@@ -26,7 +24,7 @@ export async function getMessages(): Promise<Message[]> {
 
 const MessageSchema = z.object({
     name: z.string().min(1, "名前を入力してください"),
-    age: z.coerce
+    age: z
         .number()
         .min(0, "0以上の数値を入力してください")
         .max(120, "120以下の数値を入力してください"),

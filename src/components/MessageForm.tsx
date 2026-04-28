@@ -1,7 +1,9 @@
 "use client";
 
 type Props = {
-    action: (formData: FormData) => Promise<void>;
+    action: (
+        formData: FormData,
+    ) => Promise<{ success?: boolean; error?: unknown }>;
 };
 
 export default function MessageForm({ action }: Props) {

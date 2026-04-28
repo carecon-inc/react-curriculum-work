@@ -2,7 +2,7 @@ import MessageBoard from "@/components/MessageBoard";
 import { getMessages } from "./actions/message";
 
 export default async function Home() {
-    const messages = await getMessages();
+    const messages = getMessages();
 
     return (
         <main className="min-h-screen bg-gray-100 p-8">
@@ -10,7 +10,8 @@ export default async function Home() {
                 <h1 className="text-3xl font-bold mb-8 text-center">
                     Simple Message Board
                 </h1>
-                <MessageBoard initialMessages={messages} />
+                {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                <MessageBoard initialMessages={messages as any} />
             </div>
         </main>
     );

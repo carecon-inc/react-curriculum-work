@@ -1,3 +1,6 @@
+"use client";
+
+import { getServerInfo } from "@/lib/serverUtils";
 import MessageItem from "@/components/MessageItem";
 
 type Message = {
@@ -12,9 +15,12 @@ type Props = {
 };
 
 export default function MessageList({ messages }: Props) {
+    const serverInfo = getServerInfo();
+
     return (
         <section>
             <h2 className="text-xl font-semibold mb-4">投稿一覧</h2>
+            <p className="text-xs text-gray-400 mb-2">app: {serverInfo.appName}</p>
             <MessageItem messages={messages} />
         </section>
     );
