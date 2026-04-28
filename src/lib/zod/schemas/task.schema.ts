@@ -25,12 +25,7 @@ export const createTaskSchema = z.object({
     priority: z.enum(["LOW", "MEDIUM", "HIGH"]).optional(),
     status: z.enum(["TODO", "IN_PROGRESS", "DONE"]).optional(),
     categories: z
-        .array(
-            z
-                .string()
-                .min(1, "カテゴリは1文字以上で入力してください")
-                .max(30, "カテゴリは30文字以内で入力してください"),
-        )
+        .array(z.string().max(30, "カテゴリは30文字以内で入力してください"))
         .optional(),
 });
 
@@ -47,12 +42,7 @@ export const updateTaskSchema = z.object({
     priority: z.enum(["LOW", "MEDIUM", "HIGH"]).optional(),
     status: z.enum(["TODO", "IN_PROGRESS", "DONE"]),
     categories: z
-        .array(
-            z
-                .string()
-                .min(1, "カテゴリは1文字以上で入力してください")
-                .max(30, "カテゴリは30文字以内で入力してください"),
-        )
+        .array(z.string().max(30, "カテゴリは30文字以内で入力してください"))
         .optional(),
 });
 
