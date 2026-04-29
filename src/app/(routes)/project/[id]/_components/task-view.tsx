@@ -189,35 +189,37 @@ export function TaskView({
             </div>
 
             {/* Menu Bar */}
-            <div className="flex items-center justify-between mb-6 border-b border-gray-200 pb-2">
-                <div className="flex items-center gap-3">
-                    {/* Tabs */}
-                    <div className="flex items-center gap-1">
-                        <button className="flex items-center gap-2 px-3 py-1.5 rounded text-sm transition-colors bg-[#009FE8] text-white">
-                            <Table className="w-4 h-4" />
-                            ステータス別
-                        </button>
-                    </div>
-                    {/* Search Bar */}
-                    <div className="relative">
-                        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
-                        <input
-                            type="text"
-                            value={searchInput}
-                            onChange={(e) => setSearchInput(e.target.value)}
-                            placeholder="タスク名で検索..."
-                            className="pl-8 pr-3 py-1.5 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#009FE8] focus:border-transparent w-56"
-                        />
-                    </div>
+            <div className="flex flex-wrap items-center gap-2 md:flex-nowrap md:gap-3 mb-6 border-b border-gray-200 pb-2">
+                {/* Tabs */}
+                <div className="flex items-center gap-1 order-1">
+                    <button className="flex items-center gap-2 px-3 py-1.5 rounded text-sm transition-colors bg-[#009FE8] text-white">
+                        <Table className="w-4 h-4" />
+                        ステータス別
+                    </button>
+                </div>
+                {/* Search Bar */}
+                <div className="relative order-3 w-full md:order-2 md:w-auto">
+                    <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                    <input
+                        type="text"
+                        value={searchInput}
+                        onChange={(e) => setSearchInput(e.target.value)}
+                        placeholder="タスク名で検索..."
+                        className="pl-8 pr-3 py-1.5 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#009FE8] focus:border-transparent w-full md:w-56"
+                    />
                 </div>
                 {/* CSV Download */}
                 <button
                     onClick={handleDownloadCsv}
                     disabled={isDownloading}
-                    className="flex items-center gap-2 px-3 py-1.5 rounded text-sm border border-gray-300 text-gray-600 hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="order-2 ml-auto flex items-center gap-2 px-2 md:px-3 py-1.5 rounded text-sm border border-gray-300 text-gray-600 hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                     <Download className="w-4 h-4" />
-                    {isDownloading ? "ダウンロード中..." : "CSVダウンロード"}
+                    <span className="hidden md:inline">
+                        {isDownloading
+                            ? "ダウンロード中..."
+                            : "CSVダウンロード"}
+                    </span>
                 </button>
             </div>
 
