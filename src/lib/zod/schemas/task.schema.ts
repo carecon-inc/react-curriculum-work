@@ -18,7 +18,7 @@ export const createTaskSchema = z.object({
     title: z
         .string()
         .min(1, "タスクタイトルは必須です")
-        .max(255, "タスクタイトルは255文字以内で入力してください"),
+        .max(100, "タスクタイトルは100文字以内で入力してください"),
     description: z.string().optional(),
     targetDate: z.string().optional(),
     dueDate: z.string().optional(),
@@ -35,7 +35,7 @@ export const updateTaskSchema = z.object({
     title: z
         .string()
         .min(1, "タスクタイトルは必須です")
-        .max(255, "タスクタイトルは255文字以内で入力してください"),
+        .max(100, "タスクタイトルは100文字以内で入力してください"),
     description: z.string().optional(),
     targetDate: z.string().optional(),
     dueDate: z.string().optional(),
