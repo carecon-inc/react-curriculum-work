@@ -3,6 +3,7 @@
     "version": "0.1.0",
     "private": true,
     "scripts": {
+        "postinstall": "prisma generate",
         "dev": "next dev",
         "build": "next build",
         "start": "next start",
@@ -13,7 +14,7 @@
         "db:setup": "npm run db:migrate && npm run db:generate && npm run db:seed"
     },
     "dependencies": {
-        "@prisma/adapter-mariadb": "^7.0.0",
+        "@prisma/adapter-pg": "^7.0.0",
         "@prisma/client": "^7.0.0",
         "dotenv": "^16.0.0",
         "lucide-react": "^1.8.0",

@@ -1,2 +1,0 @@
--- AlterTable
-ALTER TABLE `projects` ADD COLUMN `color` ENUM('BLUE', 'ORANGE', 'EMERALD', 'PURPLE', 'PINK') NOT NULL DEFAULT 'BLUE';
