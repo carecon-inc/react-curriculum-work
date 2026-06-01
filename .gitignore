@@ -1,0 +1,7 @@
+# 以下のファイルやディレクトリはGitで管理しないようにするための設定です。
+node_modules/
+.next/
+generated/
+
+.env
+.env.local
