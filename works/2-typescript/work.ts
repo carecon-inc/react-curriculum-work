@@ -8,7 +8,7 @@ type User {
 }
 
 // TODO: fetchUserの引数、返り値に適切な形を定義してください
-async function fetchUser(id: number): Promise<User> {
+async function fetchUser(id: number): Promise<User | null> {
   const users = [
     { id: 1, name: "田中 太郎", email: "tanaka@example.com", role: "admin" },
     { id: 2, name: "佐藤 次郎", email: "sato@example.com", role: "user" },
@@ -21,7 +21,7 @@ async function fetchUser(id: number): Promise<User> {
 }
 
 // TODO: 配列を受け取って、その最初の要素を返すジェネリック関数になるように型定義をしてください
-function getFirstElement<T>(array: [T]): T {
+function getFirstElement<T>(array: T[]): T | undefined {
   return array[0];
 }
 
