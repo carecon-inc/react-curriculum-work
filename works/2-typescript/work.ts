@@ -1,6 +1,6 @@
 // TODO: Userインターフェイスを定義してください
 // id(数値), name(文字列), email(文字列), role("admin"または"user"のユニオン型)
-interface User {
+type User {
   id: number;
   name: string;
   email: string;
@@ -8,7 +8,7 @@ interface User {
 }
 
 // TODO: fetchUserの引数、返り値に適切な形を定義してください
-async function fetchUser(id: number) {
+async function fetchUser(id: number): Promise<User> {
   const users = [
     { id: 1, name: "田中 太郎", email: "tanaka@example.com", role: "admin" },
     { id: 2, name: "佐藤 次郎", email: "sato@example.com", role: "user" },
