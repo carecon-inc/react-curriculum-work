@@ -19,7 +19,7 @@ const processOrders = async () => {
   try {
     // --- ここからワーク内容を記述 ---
 
-    // タスク1　priceが0未満の商品がないかチェック
+    // タスク1　priceが0未満の商品がないかをチェック
     const hasInvalidPrice = orders.some((order) => order.price < 0);
     if (hasInvalidPrice) {
       throw new Error("不正な価格が含まれています");
