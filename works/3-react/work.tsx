@@ -36,7 +36,7 @@ const ProductCard = (props) => {
     <div style={{ border: "1px solid #ccc", padding: "10px", margin: "10px" }}>
       <h3>{props.name}</h3>
       <p>価格: {props.price} 円</p>
-      <button onClick={() => setIsFavorite(!setIsFavorite)}>
+      <button onClick={() => setIsFavorite(!isFavorite)}>
         {isFavorite ? "★ お気に入り済み" : "☆ お気に入りに追加"}
       </button>
     </div>
