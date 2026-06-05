@@ -14,8 +14,6 @@ interface User {
 
 interface UserContextType {
   user: User;
-  text: string;
-  query: string;
 }
 
 // --- Context定義 ---
@@ -74,7 +72,7 @@ export default function App() {
   // 切り替わるタイミングを依存配列に記述
   useEffect(() => {
     console.log("ユーザーが切り替わりました");
-  }, [user.name]);
+  }, [user]);
 
   // ユーザーを擬似的に変更する関数
   const toggleUser = () => {
@@ -97,7 +95,7 @@ export default function App() {
   return (
     // TODO: UserContextを使用してください
     // .Providerで囲まれた部分はバケツリレーせず、valueのデータをいつどこからでも取り出せる
-    <UserContext.Provider value={{ user, text, query }}>
+    <UserContext.Provider value={{ user }}>
       <div style={{ padding: "20px" }}>
         <Header />
         <button onClick={toggleUser}>ユーザーを切り替える</button>
