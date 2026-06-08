@@ -37,7 +37,7 @@ export default function App() {
       console.log("データの形式が不正です:", result.error.format());
 
       // Zodのエラーレポートから「エラーメッセージの文字列」だけを抜き出し、配列を作る
-      const errorMessage = result.error.errors.map((error) => error.message);
+      const errorMessage = result.error.issues.map((error) => error.message);
       // 作った配列をStateに保存、画面に赤文字でエラーを表示
       setErrors(errorMessage);
       // 処理を終了
