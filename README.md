@@ -31,7 +31,7 @@ Reactカリキュラムのワーク用リポジトリです。
 
 ブランチ例:<br>
   `(親ブランチ) submit/20260401/T_Tanaka/bug-fix-work/parent`<br>
-  `(作業ブランチ)submit/20260401/T_Tanaka/bug-fix-work`
+  `(作業ブランチ)submit/20260401/T_Tanaka/bug-fix-work/work`
 
 ### work ブランチ
 このブランチは「TODOアプリの実装 ワーク」実施時に使用する対象ブランチとなります。  
@@ -39,7 +39,8 @@ TODOアプリの実装 ワークを実施する際は、対象ブランチから
 
 ブランチ例:<br>
     `(親ブランチ) submit/20260401/T_Tanaka/work/parent`<br>
-    `(作業ブランチ)submit/20260401/T_Tanaka/work`
+    `(作業ブランチ)submit/20260401/T_Tanaka/work-a`<br>
+    `(作業ブランチ)submit/20260401/T_Tanaka/work-b`
 
 ### 補足
 作業ブランチの命名規則は`submit/カリキュラム開始年月日/名イニシャル_姓/単元名`となります。  
