@@ -1,6 +1,6 @@
 //[タスク1]
 // id(数値), name(文字列), email(文字列), role("admin"または"user"のユニオン型)
-interface User {
+type User = {
     id: number;
     name: string;
     email: string;
@@ -18,19 +18,20 @@ const fetchUser = async (id: number): Promise<User | null> => {
 }
 
 //[タスク3]
-const getFirstElement = <T,>(array: T[]): T => {
+const getFirstElement = <T>(array: T[]): T => {
     return array[0];
 };
 
 // 実行例
-const main = async (): Promise<void> => {
+async function main() {
     const user = await fetchUser(1);
     if (user) {
         console.log(`名前: ${user.name}, 権限: ${user.role}`);
     }
+
     const numbers = [10, 20, 30];
     const firstNumber = getFirstElement(numbers);
     console.log(`最初の数値: ${firstNumber}`);
-};
+}
 
 main();
