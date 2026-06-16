@@ -9,6 +9,14 @@ const orders = [
     { id: 3, name: "Monitor", price: -5000, quantity: 2 },
 ];
 
+const checkDataIntegrity = (ordersData) => {
+            for (const item of ordersData) {
+                if (item.price < 0) {
+                    throw new Error("不正な価格が含まれています");
+                }
+            }
+            console.log("データの整合性チェック：OK");
+        }
 
 // 注文データを読み込んで処理するメイン関数
 const processOrders = async () => {
@@ -23,20 +31,9 @@ const processOrders = async () => {
     try {
         // --- ここからワーク内容を記述 ---
         // 【タスク1】
-        const checkDataIntegrity = (ordersData) => {
-            for (const item of ordersData) {
-                if (item.price < 0) {
-                    throw new Error("不正な価格が含まれています");
-                }
-            }
-            console.log("データの整合性チェック：OK");
-        }
         checkDataIntegrity(orders);
 
         // 【タスク2】
-        const filterValidOrders = (ordersData) => {
-            return ordersData.filter(item => item.quantity >= 1);
-        }
         const validOrders = filterValidOrders(orders);
 
         // 【タスク3】
