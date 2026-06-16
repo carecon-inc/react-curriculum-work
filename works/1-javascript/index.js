@@ -23,7 +23,7 @@ const processOrders = async () => {
     try {
         // --- ここからワーク内容を記述 ---
         // 【タスク1】
-        function checkDataIntegrity(ordersData) {
+        const checkDataIntegrity = (ordersData) => {
             for (const item of ordersData) {
                 if (item.price < 0) {
                     throw new Error("不正な価格が含まれています");
@@ -32,15 +32,15 @@ const processOrders = async () => {
             console.log("データの整合性チェック：OK");
         }
         checkDataIntegrity(orders);
+
         // 【タスク2】
-        function filterValidOrders(ordersData) {
+        const filterValidOrders = (ordersData) => {
             return ordersData.filter(item => item.quantity >= 1);
         }
         const validOrders = filterValidOrders(orders);
 
-
         // 【タスク3】
-        function calculateTaxIncludedPrice(item) {
+        const calculateTaxIncludedPrice = (item) => {
             const subtotal = item.price * item.quantity;
             const taxIncluded = Math.round(subtotal + (subtotal * TAX_RATE));
             return taxIncluded;
@@ -55,7 +55,7 @@ const processOrders = async () => {
         // エラーが発生した場合に内容を表示する
         console.error("処理を中断しました:", error.message);
     } finally {
-        //【タスク4】
+        //タスク４
         console.log("すべての処理が完了しました")
     }
 };
