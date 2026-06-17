@@ -1,9 +1,10 @@
 "use client";
 
+// 戻り値の型をanyに変更
 type Props = {
     action: (
         formData: FormData,
-    ) => Promise<{ success?: boolean; error?: unknown }>;
+    ) => Promise<any>;
 };
 
 export default function MessageForm({ action }: Props) {
