@@ -24,15 +24,19 @@ export async function getMessages(): Promise<Message[]> {
         },
     ];
 }
-
+// 文字数上限値を追加
 // coerceで文字列を自動的に数値に変換
 const MessageSchema = z.object({
-    name: z.string().min(1, "名前を入力してください"),
+    name: z.string()
+    .min(1, "名前を入力してください")
+    .max(20, "名前は20文字以内で入力してください"),
     age: z.coerce
         .number()
         .min(0, "0以上の数値を入力してください")
         .max(120, "120以下の数値を入力してください"),
-    content: z.string().min(1, "メッセージを入力してください"),
+    content: z.string()
+    .min(1, "メッセージを入力してください")
+    .max(1000, "メッセージは1000文字以内で入力してください"),
 });
 
 // 投稿処理

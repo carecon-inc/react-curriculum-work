@@ -29,7 +29,11 @@ export default function MessageBoard({ initialMessages }: Props) {
                 { id: Date.now(), name, age, content },
                 ...prev,
             ]);
+            // 成功した結果をMessageFormに返す
+            return result;
         }
+        // 失敗した結果もエラー情報が入ったresultをMessageFormに返す
+        return result;
     }
 
     return (

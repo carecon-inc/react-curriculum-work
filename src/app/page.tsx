@@ -2,7 +2,7 @@ import MessageBoard from "@/components/MessageBoard";
 import { getMessages } from "./actions/message";
 
 export default async function Home() {
-    // awaitを記述
+    
     const messages = await getMessages();
 
     return (
