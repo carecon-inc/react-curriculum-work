@@ -23,7 +23,7 @@ export default function MessageItem({ messages }: Props) {
                             （{message.age}歳）
                         </span>
                     </div>
-                    <p className="text-gray-600">{message.content}</p>
+                    <p className="text-gray-600 whitespace-pre-wrap break-words">{message.content}</p>
                 </li>
             ))}
         </ul>
