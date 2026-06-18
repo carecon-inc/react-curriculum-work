@@ -16,91 +16,78 @@ interface UserContextType {
   user: User;
 }
 
-// --- タスク1: Context定義 ---
+// --- Context定義 ---
+// 【タスク１】UserContextを作成してください（型はUserContextTypeを使用）
 export const UserContext = createContext<UserContextType | undefined>(undefined);
-
-// --- ヘッダーコンポーネント ---
 const Header: React.FC = () => {
-  // タスク1: Contextからユーザー情報を取得
-  const context = useContext(UserContext);
-
-  // Contextが正しく提供されていない場合のセーフティ
-  if (!context) return null;
-
+  // 【タスク１】Contextからユーザー情報を取得して差し替えてください。
+  const context = useContext(UserContext); // React.useContext から useContext に修正可能
+  const user = context ? context.user : { name: "未実装" };
   return (
     <header style={{ padding: "10px", background: "#eee", marginBottom: "10px" }}>
-      <p>ようこそ、<strong>{context.user.name}</strong> さん</p>
+      <p>ようこそ、<strong>{user.name}</strong> さん</p>
     </header>
   );
 };
 
-// --- メインのAppコンポーネント ---
+// 意図的に負荷をかけるコンポーネント（修正不要）
+const HeavyItem: React.FC<{ text: string }> = ({ text }) => {
+  const startTime = performance.now();
+  while (performance.now() - startTime < 1) {
+    /* 1msのブロック */
+  }
+  return <li>{text}</li>;
+};
+
+// 重いコンポーネント（React.memoでqueryによるメモ化を実施している）
+const HeavyList = React.memo(({ query }: { query: string }) => {
+  return (
+    <ul>
+      {Array.from({ length: 200 }, (_, i) => (
+        <HeavyItem key={i} text={`${query} の検索結果 ${i + 1}`} />
+      ))}
+    </ul>
+  );
+});
+
 export default function App() {
-  const [user, setUser] = useState<User>({ name: "ユーザーA" });
-  const [inputValue, setInputValue] = useState("");
+  const [user, setUser] = useState<User>({ name: "田中" });
+  const [text, setText] = useState("");
   const [query, setQuery] = useState("");
-
-  // タスク3: useTransitionの初期化
-  const [isPending, startTransition] = useTransition();
-
-  // タスク2: useEffectによる副作用の制御（user変更時のみ実行）
+  // 【タスク２】useEffectを実装（userが変わった時だけログを出す）
   useEffect(() => {
     console.log("ユーザーが切り替わりました");
   }, [user]);
-
-  // タスク3: 入力値変更時の処理
-  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+  // 【タスク３】useTransitionの導入
+  const [isPending, startTransition] = useTransition();
+  // ユーザーを擬似的に変更する関数
+  const toggleUser = () => {
+    setUser((prev) => ({
+      name: prev.name === "田中" ? "佐藤" : "田中",
+    }));
+  };
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    setInputValue(value); // 入力欄の反映（即時更新）
-
-    // 重いリストの更新を遅延させる
+    setText(value);
+    // 【タスク３】queryの更新によるレンダリングは遅延してください
     startTransition(() => {
       setQuery(value);
     });
   };
-
-  // ユーザー切り替え用（既存のボタン処理などがある場合）
-  const toggleUser = () => {
-    setUser((prev) => ({
-      name: prev.name === "ユーザーA" ? "ユーザーB" : "ユーザーA",
-    }));
-  };
-
   return (
-    // タスク1: Providerでアプリ全体を囲む
+    // 【タスク１】UserContextを使用してください（useContext.Providerから修正）
     <UserContext.Provider value={{ user }}>
       <div style={{ padding: "20px" }}>
         <Header />
-
-        <button onClick={toggleUser} style={{ marginBottom: "20px" }}>
-          ユーザーを切り替える
-        </button>
-
-        <div>
-          <input
-            type="text"
-            value={inputValue}
-            onChange={handleInputChange}
-            placeholder="文字を入力してください..."
-          />
-        </div>
-
-        {/* タスク3: 更新中の表示制御 */}
+        <button onClick={toggleUser}>ユーザーを切り替える</button>
+        <hr />
+        <input type="text" value={text} onChange={handleChange} placeholder="検索..." />
+        {/* 【タスク３】isPendingがtrueの時に「更新中...」と表示してください */}
         {isPending && <p>更新中...</p>}
-
-        {/* タスク3: HeavyListの表示条件（isPendingがfalse、かつ入力値が存在するとき） */}
-        {!isPending && query && <HeavyList query={query} />}
+        {/* 【タスク３】isPendingがfalse、かつqueryが入力時のみ、HeavyListを表示してください */}
+        {!isPending && query !== "" && <HeavyList query={query} />}
+        {/* 不要なHeavyListの重複表示を削除 */}
       </div>
     </UserContext.Provider>
   );
 }
-
-// --- 動作確認用のダミーHeavyList（もし無ければ参考にしてください） ---
-const HeavyList: React.FC<{ query: string }> = ({ query }) => {
-  // 意図的に重い処理を作る
-  const items = [];
-  for (let i = 0; i < 5000; i++) {
-    items.push(<li key={i}>{query} の結果 {i}</li>);
-  }
-  return <ul>{items}</ul>;
-};
