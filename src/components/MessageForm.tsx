@@ -1,14 +1,36 @@
 "use client";
-
+// useStateを追加
+import { useState } from "react";
+// 戻り値の型をanyに変更
 type Props = {
     action: (
         formData: FormData,
-    ) => Promise<{ success?: boolean; error?: unknown }>;
+    ) => Promise<any>;
 };
 
 export default function MessageForm({ action }: Props) {
+    // エラーメッセージを保存しておくステート
+    const [errors, setErrors] = useState<{ name?: string; age?: string; content?: string}>({});
+    // Zodを使って入力内容が正しいかチェックする関数
+    async function handleSubmit(formData: FormData) {
+        // 一度エラーを空にする
+        setErrors({});
+        // Zodのチェックを待つ
+        const result = await action(formData);
+        // ブラウザ画面にエラーメッセージを表示する処理
+        if (result && result.error) {
+            const formattedErrors: any = {};
+            result.error.forEach((issue: any) => {
+                const path = issue.path[0];
+                formattedErrors[path] = issue.message;
+            });
+            // ブラウザ画面にエラーメッセージを表示
+            setErrors(formattedErrors);
+        }
+    }
     return (
-        <form action={action} className="bg-white rounded-lg shadow p-6 mb-8">
+        // サーバーから返ってきたエラーをキャッチ
+        <form action={handleSubmit} className="bg-white rounded-lg shadow p-6 mb-8">
             <h2 className="text-xl font-semibold mb-4">新規投稿</h2>
             <div className="space-y-4">
                 <div>
@@ -24,8 +46,12 @@ export default function MessageForm({ action }: Props) {
                         type="text"
                         placeholder="山田 太郎"
                         className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        maxLength="20"
                         required
                     />
+                    {errors.name && (
+                        <p className="text-red-500 text-sm mt-1">{errors.name}</p>
+                    )}
                 </div>
                 <div>
                     <label
@@ -44,6 +70,9 @@ export default function MessageForm({ action }: Props) {
                         className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                         required
                     />
+                    {errors.age && (
+                        <p className="text-red-500 text-sm mt-1">{errors.age}</p>
+                    )}
                 </div>
                 <div>
                     <label
@@ -58,8 +87,12 @@ export default function MessageForm({ action }: Props) {
                         rows={4}
                         placeholder="メッセージを入力してください..."
                         className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        maxLength="1000"
                         required
                     />
+                    {errors.content && (
+                        <p className="text-red-500 text-sm mt-1">{errors.content}</p>
+                    )}
                 </div>
                 <button
                     type="submit"
