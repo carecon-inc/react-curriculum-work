@@ -7,57 +7,60 @@ const RegistrationSchema = z.object({
   email: z.string().email("正しいメールアドレスを入力してください"),
   age: z.number().min(18, "18歳以上である必要があります"),
   role: z.enum(["admin", "user"], {
-    errorMap: () => ({ message: "適切な値を選択してください" }),
+    // 指摘1: enumのエラーメッセージはオブジェクト形式で指定
+    message: "適切な値を選択してください",
   }),
 });
 
 // --- タスク2：型エイリアスの抽出 ---
-type RegistrationData = z.infer<typeof RegistrationSchema>;
+type RegistrationFormData = z.infer<typeof RegistrationSchema>;
 
 export default function App() {
-  const [formData, setFormData] = useState({
+  // Stateの定義 (指摘4: ageの初期値はnumber型に合わせて 0 にします)
+  const [formData, setFormData] = useState<RegistrationFormData>({
     username: "",
     email: "",
     age: 0,
     role: "user",
   });
-
   const [errors, setErrors] = useState<string[]>([]);
 
+  // 1. 入力変更時の処理
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+
+    setFormData({
+      ...formData,
+      // ageの場合は空文字なら0、それ以外はNumber()で数値に変換してStateへ移します
+      [name]: name === "age" ? (value === "" ? 0 : Number(value)) : value,
+    });
   };
+
+  // 2. フォーム送信時の処理
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setErrors([]);
 
-    // --- タスク3：バリデーションの実行 ---
-    const validationData = {
-      username: formData.username,
-      email: formData.email,
-      age: formData.age === "" ? undefined : Number(formData.age),
-      role: formData.role,
-    };
+    // 指摘5: validationData を再作成せず、state の formData を直接渡す
+    const result = RegistrationSchema.safeParse(formData);
 
-    const result = RegistrationSchema.safeParse(validationData);
-
+    // 指摘2: 分岐をシンプルに修正
     if (!result.success) {
-      // 💡 result.error が確実に存在する場合のみ issues を安全に map する
-      if (result.error && result.error.issues) {
-        const errorMessages = result.error.issues.map((issue) => issue.message);
-        setErrors(errorMessages);
-      } else {
-        setErrors(["バリデーションエラーが発生"]);
-      }
+      // エラーメッセージの配列を作成してstateにセット
+      const errorMessages = result.error.issues.map((issue) => issue.message);
+      setErrors(errorMessages);
     } else {
       console.log("バリデーション成功！", result.data);
-      alert("登録が成功！");
 
-      setFormData({ username: "", email: "", age: "", role: "user" });
+      // 指摘3: 要件にない alert() は削除
+
+      // 指摘4: 初期化時の age も 0 にする
+      setFormData({ username: "", email: "", age: 0, role: "user" });
     }
   };
+
   return (
     <div style={{ padding: "20px", maxWidth: "400px" }}>
       <h2>ユーザー登録</h2>
@@ -67,36 +70,37 @@ export default function App() {
       >
         <input
           name="username"
-          value={formData.username}
+          type="text"
           placeholder="ユーザー名"
+          value={formData.username}
           onChange={handleChange}
         />
         <input
           name="email"
-          value={formData.email}
+          type="email"
           placeholder="メールアドレス"
+          value={formData.email}
           onChange={handleChange}
         />
         <input
           name="age"
           type="number"
-          value={formData.age}
           placeholder="年齢"
+          value={formData.age === 0 ? "" : formData.age}
           onChange={handleChange}
         />
         <select name="role" value={formData.role} onChange={handleChange}>
-          <option value="user">一般ユーザー</option>
-          <option value="admin">管理者</option>
-          <option value="guest">ゲスト（不正な値）</option>
+          <option value="user">User</option>
+          <option value="admin">Admin</option>
         </select>
         <button type="submit">登録</button>
       </form>
 
-      {/* エラーがある時だけ画面に表示する処理 */}
+      {/* エラーメッセージの表示 */}
       {errors.length > 0 && (
-        <ul style={{ color: "red", marginTop: "20px" }}>
-          {errors.map((error, i) => (
-            <li key={i}>{error}</li>
+        <ul style={{ color: "red", marginTop: "10px" }}>
+          {errors.map((error, index) => (
+            <li key={index}>{error}</li>
           ))}
         </ul>
       )}
