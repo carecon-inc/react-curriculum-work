@@ -7,10 +7,7 @@ type Product = {
   price: number;
 };
 
-type ProductCardProps = {
-  name: string;
-  price: number;
-};
+type ProductCardProps = Pick<Product, "name" | "price">;
 
 const ProductCard = ({ name, price }: ProductCardProps) => {
   const [isFavorite, setIsFavorite] = useState<boolean>(false);
