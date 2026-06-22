@@ -7,7 +7,6 @@ const RegistrationSchema = z.object({
   email: z.string().email("正しいメールアドレスを入力してください"),
   age: z.number().min(18, "18歳以上である必要があります"),
   role: z.enum(["admin", "user"], {
-    // 指摘1: enumのエラーメッセージはオブジェクト形式で指定
     message: "適切な値を選択してください",
   }),
 });
@@ -16,7 +15,6 @@ const RegistrationSchema = z.object({
 type RegistrationFormData = z.infer<typeof RegistrationSchema>;
 
 export default function App() {
-  // Stateの定義 (指摘4: ageの初期値はnumber型に合わせて 0 にします)
   const [formData, setFormData] = useState<RegistrationFormData>({
     username: "",
     email: "",
@@ -25,7 +23,6 @@ export default function App() {
   });
   const [errors, setErrors] = useState<string[]>([]);
 
-  // 1. 入力変更時の処理
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
@@ -33,30 +30,21 @@ export default function App() {
 
     setFormData({
       ...formData,
-      // ageの場合は空文字なら0、それ以外はNumber()で数値に変換してStateへ移します
       [name]: name === "age" ? (value === "" ? 0 : Number(value)) : value,
     });
   };
-
-  // 2. フォーム送信時の処理
+  
+// --- タスク3：バリデーション実行 ---
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setErrors([]);
 
-    // 指摘5: validationData を再作成せず、state の formData を直接渡す
     const result = RegistrationSchema.safeParse(formData);
-
-    // 指摘2: 分岐をシンプルに修正
     if (!result.success) {
-      // エラーメッセージの配列を作成してstateにセット
       const errorMessages = result.error.issues.map((issue) => issue.message);
       setErrors(errorMessages);
     } else {
       console.log("バリデーション成功！", result.data);
-
-      // 指摘3: 要件にない alert() は削除
-
-      // 指摘4: 初期化時の age も 0 にする
       setFormData({ username: "", email: "", age: 0, role: "user" });
     }
   };
