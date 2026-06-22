@@ -33,8 +33,8 @@ export default function App() {
       [name]: name === "age" ? (value === "" ? 0 : Number(value)) : value,
     });
   };
-  
-// --- タスク3：バリデーション実行 ---
+
+  // --- タスク3：バリデーション実行 ---
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setErrors([]);
@@ -78,8 +78,9 @@ export default function App() {
           onChange={handleChange}
         />
         <select name="role" value={formData.role} onChange={handleChange}>
-          <option value="user">User</option>
-          <option value="admin">Admin</option>
+          <option value="user">一般ユーザー</option>
+          <option value="admin">管理者</option>
+          <option value="guest">ゲスト（不正な値）</option>
         </select>
         <button type="submit">登録</button>
       </form>
