@@ -30,10 +30,14 @@ const MessageSchema = z.object({
     name: z.string()
     .min(1, "名前を入力してください")
     .max(20, "名前は20文字以内で入力してください"),
-    age: z.coerce
-        .number()
-        .min(0, "0以上の数値を入力してください")
-        .max(120, "120以下の数値を入力してください"),
+    age: z.string()
+        .min(1, "年齢を入力してください")
+        .transform((val) => Number(val))
+        .pipe(
+            z.number()
+            .min(0, "0以上の数値を入力してください")
+            .max(120, "120以下の数値を入力してください"),
+        ),
     content: z.string()
     .min(1, "メッセージを入力してください")
     .max(1000, "メッセージは1000文字以内で入力してください"),

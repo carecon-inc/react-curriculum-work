@@ -30,7 +30,7 @@ export default function MessageForm({ action }: Props) {
     }
     return (
         // サーバーから返ってきたエラーをキャッチ
-        <form action={handleSubmit} className="bg-white rounded-lg shadow p-6 mb-8">
+        <form action={handleSubmit} noValidate className="bg-white rounded-lg shadow p-6 mb-8">
             <h2 className="text-xl font-semibold mb-4">新規投稿</h2>
             <div className="space-y-4">
                 <div>
@@ -46,7 +46,7 @@ export default function MessageForm({ action }: Props) {
                         type="text"
                         placeholder="山田 太郎"
                         className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        maxLength="20"
+                        maxLength={20}
                         required
                     />
                     {errors.name && (
@@ -87,7 +87,7 @@ export default function MessageForm({ action }: Props) {
                         rows={4}
                         placeholder="メッセージを入力してください..."
                         className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        maxLength="1000"
+                        maxLength={1000}
                         required
                     />
                     {errors.content && (
