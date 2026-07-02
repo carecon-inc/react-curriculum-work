@@ -19,19 +19,30 @@ const processOrders = async () => {
   try {
     // --- ここからワーク内容を記述 ---
     //タスク1:データの整合性チェック ※タスク2とタスク3の動作確認する場合、コメントアウト必須
-    orders.forEach((order) => {
-      if (order.price < 0) {
-        throw new Error("不正な価格が含まれています");
-      }
-    });
+    // orders.forEach((order) => {
+    //   if (order.price < 0) {
+    //     throw new Error("不正な価格が含まれています");
+    //   }
+    // });
     //タスク2:有効な注文の絞り込み
     const validOrders = orders.filter((order) => order.quantity > 0);
     console.log("有効な注文:", validOrders);
     //タスク3:税込金額の計算と表示
-    const total = validOrders.reduce((acc, order) => {
-      return acc + order.price * order.quantity * (1 + TAX_RATE);
-    }, 0);
-    console.log(`税込み合計金額: ${total} 円`);
+    const productTotals = validOrders.map((order) => {
+      return {
+        name: order.name,
+        total: order.price * order.quantity * (1 + TAX_RATE),
+      };
+    });
+
+    // 商品ごとに税込金額を計算して表示
+    validOrders.forEach((order) => {
+      const total = order.price * order.quantity * (1 + TAX_RATE);
+      const formattedTotal = total.toLocaleString(); // カンマ区切り
+
+      console.log(`商品名: ${order.name}, 合計金額(税込): ${formattedTotal}円`);
+    });
+
     //132000-11000
   } catch (error) {
     // エラーが発生した場合に内容を表示する
