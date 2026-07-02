@@ -39,7 +39,7 @@ const processOrders = async () => {
     });
   } catch (error) {
     // エラーが発生した場合に内容を表示する
-    console.log("処理を中断しました:", error.message);
+    console.error("処理を中断しました:", error.message);
   } finally {
     // 成功・失敗に関わらず、最後に必ず実行される
     console.log("すべての処理が完了しました");
