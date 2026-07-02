@@ -19,11 +19,11 @@ const processOrders = async () => {
   try {
     // --- ここからワーク内容を記述 ---
     //タスク1:データの整合性チェック ※タスク2とタスク3の動作確認する場合、コメントアウト必須
-    // orders.forEach((order) => {
-    //   if (order.price < 0) {
-    //     throw new Error("不正な価格が含まれています");
-    //   }
-    // });
+    orders.forEach((order) => {
+      if (order.price < 0) {
+        throw new Error("不正な価格が含まれています");
+      }
+    });
     //タスク2:有効な注文の絞り込み
     const validOrders = orders.filter((order) => order.quantity > 0);
     console.log("有効な注文:", validOrders);
