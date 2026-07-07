@@ -36,15 +36,16 @@ const ProductCard = ({ name, price }: ProductCardProps) => {
   //--- タスク3: stateによる状態管理 ---
   // ここに「お気に入り（isFavorite）」のStateを定義
   const [isFavorite, setIsFavorite] = useState(false);
+
+  const FavoriteClick = () => {
+    setIsFavorite((prev) => !prev);
+  };
+
   return (
     <div style={{ border: "1px solid #ccc", padding: "10px", margin: "10px" }}>
       <h3>{name}</h3>
       <p>価格: {price} 円</p>
-      <button
-        onClick={() => {
-          setIsFavorite(!isFavorite);
-        }}
-      >
+      <button onClick={FavoriteClick}>
         {isFavorite ? "★ お気に入り済み" : "☆ お気に入りに追加"}
       </button>
     </div>
