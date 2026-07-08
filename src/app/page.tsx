@@ -11,7 +11,7 @@ export default async function Home() {
           Simple Message Board
         </h1>
         {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-        <MessageBoard initialMessages={messages as any} />
+        <MessageBoard initialMessages={messages} />
       </div>
     </main>
   );
