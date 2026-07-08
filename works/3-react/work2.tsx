@@ -64,7 +64,7 @@ export default function App() {
 
   // TODO: useEffectを実装（userが変わった時だけログを出す）
   useEffect(() => {
-    console.log(user.name, "さんにユーザーが切り替わりました");
+    console.log("ユーザーが切り替わりました");
   }, [user]);
 
   // ユーザーを擬似的に変更する関数
