@@ -6,36 +6,34 @@ import MessageForm from "./MessageForm";
 import MessageList from "./MessageList";
 
 type Message = {
-    id: number;
-    name: string;
-    age: number;
-    content: string;
+  id: number;
+  name: string;
+  age: number;
+  content: string;
 };
 
 type Props = {
-    initialMessages: Message[];
+  initialMessages: Message[];
 };
 
 export default function MessageBoard({ initialMessages }: Props) {
-    const [messages, setMessages] = useState<Message[]>(initialMessages);
+  const [messages, setMessages] = useState<Message[]>(initialMessages);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-    async function handleSubmit(formData: FormData) {
-        const result = await postMessage(formData);
-        if (result?.success) {
-            const name = formData.get("name") as string;
-            const age = Number(formData.get("age"));
-            const content = formData.get("content") as string;
-            setMessages((prev) => [
-                { id: Date.now(), name, age, content },
-                ...prev,
-            ]);
-        }
+  async function handleSubmit(formData: FormData) {
+    const result = await postMessage(formData);
+    if (!result.success) {
+      setErrorMessage(result.error);
+      return;
     }
+    setErrorMessage(null);
+    setMessages((prev) => [result.message, ...prev]);
+  }
 
-    return (
-        <>
-            <MessageForm action={handleSubmit} />
-            <MessageList messages={messages} />
-        </>
-    );
+  return (
+    <>
+      <MessageForm action={handleSubmit} errorMessage={errorMessage} />
+      <MessageList messages={messages} />
+    </>
+  );
 }

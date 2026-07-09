@@ -2,12 +2,17 @@
 
 type Props = {
   action: (formData: FormData) => Promise<void>;
+  errorMessage: string | null;
 };
 
-export default function MessageForm({ action }: Props) {
+export default function MessageForm({ action, errorMessage }: Props) {
   return (
     <form action={action} className="bg-white rounded-lg shadow p-6 mb-8">
       <h2 className="text-xl font-semibold mb-4">新規投稿</h2>
+
+      {errorMessage && (
+        <p className="mb-4 text-sm text-red-600">{errorMessage}</p>
+      )}
       <div className="space-y-4">
         <div>
           <label

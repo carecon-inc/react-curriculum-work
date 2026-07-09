@@ -45,7 +45,11 @@ const MessageSchema = z.object({
 });
 
 // 投稿処理
-export async function postMessage(formData: FormData) {
+export async function postMessage(
+  formData: FormData,
+): Promise<
+  { success: true; message: Message } | { success: false; error: string }
+> {
   const result = MessageSchema.safeParse({
     name: formData.get("name"),
     age: formData.get("age"),
@@ -53,8 +57,10 @@ export async function postMessage(formData: FormData) {
   });
 
   if (!result.success) {
+    const errorMessage =
+      result.error.issues[0]?.message ?? "入力内容を確認してください";
     console.error("Validation error:", result.error.issues);
-    return;
+    return { success: false, error: errorMessage };
   }
 
   const newMessage: Message = {
@@ -70,4 +76,6 @@ export async function postMessage(formData: FormData) {
 
   console.log("投稿データ:", result.data);
   revalidatePath("/");
+
+  return { success: true, message: newMessage };
 }
