@@ -1,18 +1,21 @@
 "use client";
 
-type Props = {
-  action: (formData: FormData) => Promise<void>;
-  errorMessage: string | null;
+type MessageFormErrors = {
+  name?: string[];
+  age?: string[];
+  content?: string[];
 };
 
-export default function MessageForm({ action, errorMessage }: Props) {
+type Props = {
+  action: (formData: FormData) => Promise<void>;
+  errorMessages: MessageFormErrors;
+};
+
+export default function MessageForm({ action, errorMessages }: Props) {
   return (
     <form action={action} className="bg-white rounded-lg shadow p-6 mb-8">
       <h2 className="text-xl font-semibold mb-4">新規投稿</h2>
 
-      {errorMessage && (
-        <p className="mb-4 text-sm text-red-600">{errorMessage}</p>
-      )}
       <div className="space-y-4">
         <div>
           <label
@@ -30,6 +33,12 @@ export default function MessageForm({ action, errorMessage }: Props) {
             className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             required
           />
+
+          {errorMessages.name?.map((message, index) => (
+            <p key={index} className="mt-1 text-sm text-red-600">
+              {message}
+            </p>
+          ))}
         </div>
         <div>
           <label
@@ -49,6 +58,12 @@ export default function MessageForm({ action, errorMessage }: Props) {
             className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             required
           />
+
+          {errorMessages.age?.map((message, index) => (
+            <p key={index} className="mt-1 text-sm text-red-600">
+              {message}
+            </p>
+          ))}
         </div>
         <div>
           <label
@@ -66,6 +81,12 @@ export default function MessageForm({ action, errorMessage }: Props) {
             className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             required
           />
+
+          {errorMessages.content?.map((message, index) => (
+            <p key={index} className="mt-1 text-sm text-red-600">
+              {message}
+            </p>
+          ))}
         </div>
         <button
           type="submit"

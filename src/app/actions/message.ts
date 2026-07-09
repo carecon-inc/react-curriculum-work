@@ -10,6 +10,12 @@ type Message = {
   content: string;
 };
 
+type MessageFormError = {
+  name?: string[];
+  age?: string[];
+  content?: string[];
+};
+
 const messages: Message[] = [
   { id: 1, name: "Alice", age: 25, content: "Hello, world!" },
   { id: 2, name: "Bob", age: 30, content: "Next.js の勉強中です！" },
@@ -32,11 +38,19 @@ const MessageSchema = z.object({
     .trim()
     .min(1, "名前を入力してください")
     .max(20, "名前は20文字以下で入力してください"),
-  age: z.coerce
-    .number()
-    .int("年齢は整数で入力してください")
-    .min(1, "1以上の数値を入力してください")
-    .max(120, "120以下の数値を入力してください"),
+  age: z
+    .string()
+    .trim()
+    .min(1, "年齢を入力してください")
+    .regex(/^\d+$/, "年齢は半角数字の整数で入力してください")
+    .transform(Number)
+    .pipe(
+      z
+        .number()
+        .int("年齢は整数で入力してください")
+        .min(1, "1以上の数値を入力してください")
+        .max(120, "120以下の数値を入力してください"),
+    ),
   content: z
     .string()
     .trim()
@@ -48,7 +62,8 @@ const MessageSchema = z.object({
 export async function postMessage(
   formData: FormData,
 ): Promise<
-  { success: true; message: Message } | { success: false; error: string }
+  | { success: true; message: Message }
+  | { success: false; errors: MessageFormError }
 > {
   const result = MessageSchema.safeParse({
     name: formData.get("name"),
@@ -57,10 +72,27 @@ export async function postMessage(
   });
 
   if (!result.success) {
-    const errorMessage =
-      result.error.issues[0]?.message ?? "入力内容を確認してください";
+    const errors: MessageFormError = {};
+
+    result.error.issues.forEach((issue) => {
+      const fieldName = issue.path[0];
+
+      if (
+        fieldName === "name" ||
+        fieldName === "age" ||
+        fieldName === "content"
+      ) {
+        if (!errors[fieldName]) {
+          errors[fieldName] = [];
+        }
+
+        errors[fieldName]?.push(issue.message);
+      }
+    });
+
     console.error("Validation error:", result.error.issues);
-    return { success: false, error: errorMessage };
+
+    return { success: false, errors };
   }
 
   const newMessage: Message = {
