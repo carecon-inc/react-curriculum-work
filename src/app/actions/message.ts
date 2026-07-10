@@ -83,10 +83,8 @@ export async function postMessage(
         fieldName === "content"
       ) {
         if (!errors[fieldName]) {
-          errors[fieldName] = [];
+          errors[fieldName] = [issue.message];
         }
-
-        errors[fieldName]?.push(issue.message);
       }
     });
 
