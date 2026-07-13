@@ -12,11 +12,11 @@ export default function App() {
     return (
         <div>
             <h1>商品一覧</h1>
-            {products.map((product)=>(
+            {products.map((product) => (
                 <ProductCard
-                key={product.id}
-                name={product.name}
-                price={product.price}
+                    key={product.id}
+                    name={product.name}
+                    price={product.price}
                 />
             ))}
         </div>
@@ -36,18 +36,22 @@ const ProductCard = ({ name, price }: Props) => {
     // ここに「お気に入り（isFavorite）」のStateを定義
     const [isFavorite, setIsFavorite] = useState(false);
 
+    const toggleFavorite = () => {
+        setIsFavorite(!isFavorite)
+    };
+
     return (
         <div style={{ border: "1px solid #ccc", padding: "10px", margin: "10px" }}>
             <h3>{name}</h3>
             <p>価格: {price} 円</p>
             <button
-                onClick={() => {
+                onClick={
                     /* クリックでFavoriteを反転 */
-                    setIsFavorite(!isFavorite)
-                }}
+                    toggleFavorite
+                }
             >
                 {/* Stateに応じて「★ お気に入り済み」か「☆ お気に入りに追加」を表示 */}
-            {isFavorite ? "★ お気に入り済み" : "☆ お気に入りに追加" }
+                {isFavorite ? "★ お気に入り済み" : "☆ お気に入りに追加"}
             </button>
         </div>
     );
