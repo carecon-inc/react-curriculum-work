@@ -31,7 +31,7 @@ export default function App() {
     const result = RegistrationSchema.safeParse(formData);
 
     if (!result.success) {
-        const errorMessages = result.error.errors.map((err) => err.message);
+        const errorMessages = result.error.issues.map((err) => err.message);
         setErrors(errorMessages);
         return;
     }
