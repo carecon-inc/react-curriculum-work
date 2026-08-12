@@ -8,7 +8,7 @@ export type Message = {
 //errorsの配列
 export type FormState = {
   success: boolean;
-    errors: string[];
+  errors: string[];
 };
 
 type Props = {
