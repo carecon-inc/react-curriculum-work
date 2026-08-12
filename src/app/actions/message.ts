@@ -1,3 +1,4 @@
+"use server";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
@@ -24,18 +25,29 @@ export async function getMessages(): Promise<Message[]> {
 
 const MessageSchema = z.object({
     name: z.string().min(1, "名前を入力してください"),
+
+    // ↓ ここを修正
     age: z
+    .string()
+    .min(1, "年齢を入力してください") // ① 未入力（""）チェック
+    .refine((val) => !isNaN(Number(val)), {
+      message: "半角数値で入力してください", // ② 数値変換できるかチェック
+    })
+    .transform((val) => Number(val)) // ③ 文字列を数値に変換
+    .pipe(
+      z
         .number()
-        .min(0, "0以上の数値を入力してください")
-        .max(120, "120以下の数値を入力してください"),
+        .min(0, "0以上の数値を入力してください") // ④ 範囲チェック
+        .max(120, "120以下の数値を入力してください")
+    ),
     content: z.string().min(1, "メッセージを入力してください"),
 });
 
 // 投稿処理
-export async function postMessage(formData: FormData) {
+export async function postMessage(formData: FormData): Promise<{ success?: boolean; error?: unknown }> {
     const result = MessageSchema.safeParse({
         name: formData.get("name"),
-        age: formData.get("age"),
+        age: formData.get("age") ?? "" ,
         content: formData.get("content"),
     });
 

@@ -18,9 +18,11 @@ type Props = {
 
 export default function MessageBoard({ initialMessages }: Props) {
     const [messages, setMessages] = useState<Message[]>(initialMessages);
+    const [errors, setErrors] = useState<string[]>([]);
 
     async function handleSubmit(formData: FormData) {
         const result = await postMessage(formData);
+        console.log(result);
         if (result?.success) {
             const name = formData.get("name") as string;
             const age = Number(formData.get("age"));
@@ -29,7 +31,11 @@ export default function MessageBoard({ initialMessages }: Props) {
                 { id: Date.now(), name, age, content },
                 ...prev,
             ]);
+        } else {
+            const errorMessages = result.error.map((issue) => issue.message);
+            setErrors(errorMessages);
         }
+        return result;
     }
 
     return (

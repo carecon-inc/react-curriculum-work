@@ -2,7 +2,7 @@ import MessageBoard from "@/components/MessageBoard";
 import { getMessages } from "./actions/message";
 
 export default async function Home() {
-    const messages = getMessages();
+    const messages = await getMessages();
 
     return (
         <main className="min-h-screen bg-gray-100 p-8">
