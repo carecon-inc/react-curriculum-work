@@ -1,14 +1,19 @@
-import { ProjectCard, Project } from "./project-card";
+"use client";
+
+import { useState } from "react";
+import { ProjectCard } from "./project-card";
+import { Project } from "./project-card";
+import { CreateProjectModal } from "./create-project-modal";
 
 interface ProjectListProps {
   projects: Project[];
   onOpenCreateModal?: () => void;
 }
 
-export const ProjectList = ({
-  projects,
-  onOpenCreateModal,
-}: ProjectListProps) => {
+export const ProjectList = ({ projects }: ProjectListProps) => {
+  // 1. モーダルの開閉を管理するState
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+
   return (
     <div className="max-w-7xl mx-auto px-4 py-6">
       {/* ヘッダー領域 */}
@@ -19,26 +24,26 @@ export const ProjectList = ({
             タスクを管理するプロジェクトを選択してください
           </p>
         </div>
+        {/* 2. ヘッダーの「新規プロジェクト」ボタン */}
         <button
           type="button"
-          onClick={onOpenCreateModal}
-          className="bg-sky-500 hover:bg-sky-600 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
+          onClick={() => setIsCreateModalOpen(true)}
+          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors cursor-pointer"
         >
-          + 新規プロジェクト
+          新規プロジェクト
         </button>
       </div>
 
       {/* カードグリッド表示 */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {/* 既存プロジェクトのカード一覧 */}
         {projects.map((project) => (
           <ProjectCard key={project.id} project={project} />
         ))}
 
-        {/* 点線枠のカード型新規作成ボタン */}
+        {/* 3. 点線枠のカード型新規作成ボタン */}
         <button
           type="button"
-          onClick={onOpenCreateModal}
+          onClick={() => setIsCreateModalOpen(true)}
           className="flex flex-col items-center justify-center min-h-[160px] p-6 border-2 border-dashed border-gray-300 rounded-xl bg-gray-50/50 hover:bg-gray-100/80 hover:border-gray-400 transition-all text-gray-600 hover:text-gray-900 group cursor-pointer"
         >
           <div className="w-10 h-10 rounded-full bg-white border border-gray-200 flex items-center justify-center mb-2 shadow-sm group-hover:scale-105 transition-transform">
@@ -47,6 +52,12 @@ export const ProjectList = ({
           <span className="text-sm font-medium">新しいプロジェクトを作成</span>
         </button>
       </div>
+
+      {/* 4. モーダルコンポーネントの配置 */}
+      <CreateProjectModal
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+      />
     </div>
   );
 };

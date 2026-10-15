@@ -41,20 +41,20 @@ export const ProjectCard = ({ project }: ProjectCardProps) => {
         <div className="min-h-[2.5rem] mb-4" />
       )}
 
-      {/* 3. タスク数 & 完了数（プログレスバーの上に配置） */}
-      <div className="flex items-center justify-between text-xs text-gray-500 font-medium mb-2">
-        <span>{totalTasks} タスク</span>
-        <span>
-          {completedTaskCount} / {totalTasks} 完了
-        </span>
-      </div>
-
-      {/* 4. プログレスバー（境界線なし） */}
-      <div className="w-full bg-gray-100 rounded-full h-2 overflow-hidden">
+      {/* 3. プログレスバー */}
+      <div className="w-full bg-gray-100 rounded-full h-2 mb-3 overflow-hidden">
         <div
           className="bg-blue-600 h-2 rounded-full transition-all duration-300"
           style={{ width: `${progressPercentage}%` }}
         />
+      </div>
+
+      {/* 4. タスク件数・完了数 */}
+      <div className="flex items-center justify-between text-xs text-gray-500 font-medium pt-2 border-t border-gray-100">
+        <span>{totalTasks} タスク</span>
+        <span>
+          {completedTaskCount} / {totalTasks} 完了
+        </span>
       </div>
     </Link>
   );
