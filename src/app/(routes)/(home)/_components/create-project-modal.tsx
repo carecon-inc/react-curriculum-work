@@ -21,7 +21,6 @@ export const CreateProjectModal = ({
   const handleSubmit = (e: any) => {
     e.preventDefault();
 
-    // 仕様に基づくバリデーション（アラート表示）
     if (name.length > 100) {
       alert("プロジェクト名は100文字以内で入力してください");
       return;
@@ -47,7 +46,6 @@ export const CreateProjectModal = ({
     });
   };
 
-  // プロジェクト名が未入力（空文字・スペースのみ）または送信中の場合はボタンを非活性
   const isSubmitDisabled = !name.trim() || isPending;
 
   return (
@@ -58,7 +56,6 @@ export const CreateProjectModal = ({
         </h2>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* プロジェクト名 */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               プロジェクト名 <span className="text-red-500">*</span>
@@ -67,12 +64,11 @@ export const CreateProjectModal = ({
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="例: 読書TODO"
+              placeholder="例: 個人開発プロジェクト"
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
             />
           </div>
 
-          {/* 説明 */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               説明
@@ -80,15 +76,12 @@ export const CreateProjectModal = ({
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="プロジェクトの説明（任意）"
+              placeholder="プロジェクトの概要を入力"
               rows={3}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
             />
           </div>
 
-          {/* ※カラー指定UIはこの時点では実装不要のため除外しています */}
-
-          {/* ボタン群 */}
           <div className="flex justify-end gap-3 pt-4 border-t border-gray-100">
             <button
               type="button"

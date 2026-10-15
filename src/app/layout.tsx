@@ -6,11 +6,9 @@ export const metadata: Metadata = {
   description: "Next.js + Prisma で作るタスク管理アプリ",
 };
 
-/* Header component */
 export const Header: React.FC = () => {
   return (
     <header className="bg-sky-500 text-white px-6 py-3 shadow-sm flex justify-between items-center">
-      {/* 左側：ロゴとアイコン */}
       <div className="flex items-center gap-2">
         <svg
           className="w-5 h-5 stroke-current"
@@ -31,10 +29,9 @@ export const Header: React.FC = () => {
   );
 };
 
-/* Footer component */
 export const Footer: React.FC = () => {
   return (
-    <header className="bg-sky-500 text-white px-6 py-3 shadow-sm flex justify-between items-center">
+    <footer className="bg-sky-500 text-white px-6 py-6 shadow-sm flex flex-col sm:flex-row justify-between items-center gap-3">
       {/* 左側：ロゴとアイコン */}
       <div className="flex items-center gap-2">
         <svg
@@ -52,11 +49,12 @@ export const Footer: React.FC = () => {
         </svg>
         <span className="text-lg font-bold tracking-wide">TaskFlow</span>
       </div>
-      {/* 右側：コピーライト表記 */}
-      <p className="text-xs text-white/80">
+
+      {/* 右側：コピーライト表記（スマホ時は縦に改行して配置） */}
+      <p className="text-xs text-white/90">
         &copy; 2026 TaskFlow. All rights reserved.
       </p>
-    </header>
+    </footer>
   );
 };
 
@@ -67,10 +65,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ja">
-      <body>
-        <Header />
-        {children}
-        <Footer />
+      <body className="bg-gray-50 text-gray-900">
+        <div className="flex flex-col min-h-[120vh]">
+          <Header />
+          <main className="flex-grow pb-16">{children}</main>
+          <Footer />
+        </div>
       </body>
     </html>
   );
