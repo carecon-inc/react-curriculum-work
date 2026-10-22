@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { useState, useRef, useEffect } from "react";
+import { EditProjectModal } from "./edit-project-modal";
+import { DeleteConfirmModal } from "./delete-confirm-modal";
 
 export interface Task {
   id: string;
@@ -12,23 +14,28 @@ export interface Project {
   id: string;
   name: string;
   description?: string | null;
+  color?: string | null;
   tasks: Task[];
 }
 
 interface ProjectCardProps {
   project: Project;
-  onUpdate: (updatedProject: Project) => void;
-  onDelete: (projectId: string) => void;
 }
 
-export const ProjectCard = ({ project, onUpdate, onDelete }: ProjectCardProps) => {
+const COLOR_CODES: Record<string, string> = {
+  blue: "#3b82f6",
+  orange: "#f97316",
+  green: "#22c55e",
+  purple: "#a855f7",
+  pink: "#ec4899",
+};
+
+export const ProjectCard = ({ project }: ProjectCardProps) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  
-  // フォーム用のローカルステート
-  const [editedName, setEditedName] = useState(project.name);
-  const [editedDescription, setEditedDescription] = useState(project.description || "");
-  
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const colorKey = project.color ?? "blue";
+
   const menuRef = useRef<HTMLDivElement>(null);
 
   const totalTasks = project.tasks.length;
@@ -36,7 +43,7 @@ export const ProjectCard = ({ project, onUpdate, onDelete }: ProjectCardProps) =
   const progressPercentage =
     totalTasks > 0 ? Math.round((completedTaskCount / totalTasks) * 100) : 0;
 
-  // メニュー外クリックで閉じる
+  // メニューの外側をクリックしたときにメニューを閉じる
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
@@ -47,28 +54,23 @@ export const ProjectCard = ({ project, onUpdate, onDelete }: ProjectCardProps) =
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // 編集内容の保存処理
-  const handleEditSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    // 親コンポーネントへ新しいデータを通知
-    onUpdate({
-      ...project,
-      name: editedName,
-      description: editedDescription,
-    });
-
-    setIsEditModalOpen(false);
-  };
-
   return (
     <>
       <div className="relative border border-gray-200 rounded-xl p-5 shadow-sm bg-white hover:shadow-md hover:border-gray-300 transition-all">
-        {/* 上部：フォルダロゴ + タイトル ＆ 三点リーダボタン */}
+        {/* 上部：フォルダアイコン + タイトル ＆ 三点リーダボタン */}
         <div className="flex items-center justify-between mb-3">
-          <Link href={`/projects/${project.id}`} className="flex items-center gap-3 group flex-grow min-w-0">
-            <svg className="w-8 h-8 shrink-0" viewBox="0 0 24 24">
-              <rect width="24" height="24" rx="4" className="fill-sky-500" />
+          <Link
+            href={`/projects/${project.id}`}
+            className="flex items-center gap-3 group flex-grow min-w-0"
+          >
+            {/* フォルダロゴ（背景青＋白抜き） */}
+            <svg className="w-6 h-6" viewBox="0 0 24 24">
+              <rect
+                width="24"
+                height="24"
+                rx="4"
+                fill={COLOR_CODES[colorKey]}
+              />
               <path
                 fill="none"
                 stroke="white"
@@ -83,7 +85,7 @@ export const ProjectCard = ({ project, onUpdate, onDelete }: ProjectCardProps) =
             </h2>
           </Link>
 
-          {/* 三点リーダボタン */}
+          {/* 右側：三点リーダボタン */}
           <div className="relative ml-2" ref={menuRef}>
             <button
               onClick={(e) => {
@@ -99,7 +101,7 @@ export const ProjectCard = ({ project, onUpdate, onDelete }: ProjectCardProps) =
               </svg>
             </button>
 
-            {/* ドロップダウンメニュー */}
+            {/* ドロップダウンメニュー（編集・削除） */}
             {isMenuOpen && (
               <div className="absolute right-0 mt-1 w-36 bg-white border border-gray-200 rounded-lg shadow-lg py-1 z-10">
                 <button
@@ -107,7 +109,7 @@ export const ProjectCard = ({ project, onUpdate, onDelete }: ProjectCardProps) =
                     e.preventDefault();
                     e.stopPropagation();
                     setIsMenuOpen(false);
-                    setIsEditModalOpen(true);
+                    setIsEditModalOpen(true); // 編集モーダルを開く
                   }}
                   className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
                 >
@@ -118,9 +120,7 @@ export const ProjectCard = ({ project, onUpdate, onDelete }: ProjectCardProps) =
                     e.preventDefault();
                     e.stopPropagation();
                     setIsMenuOpen(false);
-                    if (confirm("本当にこのプロジェクトを削除しますか？")) {
-                      onDelete(project.id);
-                    }
+                    setIsDeleteModalOpen(true); // 削除確認モーダルを開く
                   }}
                   className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
                 >
@@ -131,7 +131,7 @@ export const ProjectCard = ({ project, onUpdate, onDelete }: ProjectCardProps) =
           </div>
         </div>
 
-        {/* カード本体のリンク領域 */}
+        {/* カード本体のリンク領域（説明文・プログレスバー・タスク件数） */}
         <Link href={`/projects/${project.id}`} className="block">
           {project.description ? (
             <p className="text-sm text-gray-600 mb-4 line-clamp-2 min-h-[2.5rem]">
@@ -157,57 +157,19 @@ export const ProjectCard = ({ project, onUpdate, onDelete }: ProjectCardProps) =
         </Link>
       </div>
 
-      {/* 編集用モーダル */}
-      {isEditModalOpen && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl max-w-md w-full p-6 shadow-xl" onClick={(e) => e.stopPropagation()}>
-            <h3 className="text-lg font-bold text-gray-900 mb-4">プロジェクトを編集</h3>
-            
-            <form onSubmit={handleEditSubmit} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  プロジェクト名
-                </label>
-                <input
-                  type="text"
-                  value={editedName}
-                  onChange={(e) => setEditedName(e.target.value)}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
-                  required
-                />
-              </div>
+      {/* 2. 編集用モーダルコンポーネントの呼び出し */}
+      <EditProjectModal
+        project={project}
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+      />
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  説明
-                </label>
-                <textarea
-                  value={editedDescription}
-                  onChange={(e) => setEditedDescription(e.target.value)}
-                  rows={3}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
-                />
-              </div>
-
-              <div className="flex justify-end gap-2 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setIsEditModalOpen(false)}
-                  className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-100 transition-colors"
-                >
-                  キャンセル
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 bg-sky-500 text-white rounded-lg text-sm font-medium hover:bg-sky-600 transition-colors"
-                >
-                  保存
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      {/* 3. 削除確認用モーダルコンポーネントの呼び出し */}
+      <DeleteConfirmModal
+        project={project}
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+      />
     </>
   );
 };

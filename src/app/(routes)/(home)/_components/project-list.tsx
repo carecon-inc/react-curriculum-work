@@ -13,7 +13,7 @@ export const ProjectList = ({ projects }: ProjectListProps) => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   return (
-    <div className="w-full max-w-[1400px] mx-auto px-6 sm:px-8 lg:px-12 py-8 flex-grow">
+    <div className="w-full max-w-6xl mx-auto px-4 sm:px-8 lg:px-12 py-8 flex-grow">
       {/* ヘッダー領域（スマホ対応の折り返し） */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
         <div>

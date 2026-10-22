@@ -1,59 +1,112 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState } from "react";
 import { createProjectAction } from "../action";
+
+const PROJECT_COLORS = [
+  {
+    id: "blue",
+    label: "青",
+    bgClass: "bg-blue-500",
+    ringClass: "ring-blue-500",
+  },
+  {
+    id: "orange",
+    label: "橙",
+    bgClass: "bg-orange-500",
+    ringClass: "ring-orange-500",
+  },
+  {
+    id: "green",
+    label: "緑",
+    bgClass: "bg-green-500",
+    ringClass: "ring-green-500",
+  },
+  {
+    id: "purple",
+    label: "紫",
+    bgClass: "bg-purple-500",
+    ringClass: "ring-purple-500",
+  },
+  {
+    id: "pink",
+    label: "ピンク",
+    bgClass: "bg-pink-500",
+    ringClass: "ring-pink-500",
+  },
+];
 
 interface CreateProjectModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-export const CreateProjectModal = ({
+export function CreateProjectModal({
   isOpen,
   onClose,
-}: CreateProjectModalProps) => {
+}: CreateProjectModalProps) {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
-  const [isPending, startTransition] = useTransition();
+  const [color, setColor] = useState("blue");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e: any) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
 
+    if (!name.trim()) {
+      setError("プロジェクト名は必須です。");
+      return;
+    }
     if (name.length > 100) {
-      alert("プロジェクト名は100文字以内で入力してください");
+      setError("プロジェクト名は100文字以内で入力してください。");
       return;
     }
     if (description.length > 1000) {
-      alert("説明は1000文字以内で入力してください");
+      setError("説明は1000文字以内で入力してください。");
       return;
     }
 
-    startTransition(async () => {
-      const res = await createProjectAction({
+    setLoading(true);
+
+    try {
+      // カラーが未選択の場合は "blue" をフォールバックとして送信
+      await createProjectAction({
         name,
         description,
+        color: color || "blue",
       });
 
-      if (res.success) {
-        setName("");
-        setDescription("");
-        onClose();
+      onClose();
+      setName("");
+      setDescription("");
+      setColor("blue");
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
       } else {
-        alert(res.error || "作成に失敗しました");
+        setError("予期せぬエラーが発生しました。");
       }
-    });
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const isSubmitDisabled = !name.trim() || isPending;
-
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="w-full max-w-md bg-white rounded-xl p-6 shadow-xl">
-        <h2 className="text-xl font-bold text-gray-900 mb-4">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-xl max-w-md w-full p-6 shadow-xl">
+        <h2 className="text-lg font-bold text-gray-900 mb-4">
           新規プロジェクト作成
         </h2>
+
+        {error && (
+          <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-600 text-sm rounded-lg">
+            {error}
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
@@ -64,8 +117,10 @@ export const CreateProjectModal = ({
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="例: 個人開発プロジェクト"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+              required
+              maxLength={100}
+              placeholder="プロジェクト名を入力"
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
             />
           </div>
 
@@ -76,31 +131,56 @@ export const CreateProjectModal = ({
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="プロジェクトの概要を入力"
+              maxLength={1000}
               rows={3}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+              placeholder="プロジェクトの説明を入力"
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
             />
           </div>
 
-          <div className="flex justify-end gap-3 pt-4 border-t border-gray-100">
+          {/* カラー選択（任意） */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              カラー
+            </label>
+            <div className="flex items-center gap-3">
+              {PROJECT_COLORS.map((c) => {
+                const isSelected = color === c.id;
+                return (
+                  <button
+                    type="button"
+                    key={c.id}
+                    onClick={() => setColor(c.id)}
+                    className={`w-8 h-8 rounded-full ${c.bgClass} transition-transform ${
+                      isSelected
+                        ? `ring-4 ${c.ringClass} ring-offset-2 scale-110`
+                        : "opacity-75 hover:opacity-100"
+                    }`}
+                    aria-label={c.label}
+                  />
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="flex justify-end gap-3 pt-2">
             <button
               type="button"
               onClick={onClose}
-              disabled={isPending}
-              className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
+              className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
             >
               キャンセル
             </button>
             <button
               type="submit"
-              disabled={isSubmitDisabled}
-              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+              disabled={loading}
+              className="px-4 py-2 text-sm bg-sky-600 text-white rounded-lg hover:bg-sky-700 transition-colors disabled:opacity-50"
             >
-              {isPending ? "作成中..." : "作成"}
+              {loading ? "作成中..." : "作成する"}
             </button>
           </div>
         </form>
       </div>
     </div>
   );
-};
+}
