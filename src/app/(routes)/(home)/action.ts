@@ -46,7 +46,7 @@ export async function createProjectAction(data: {
 
 // プロジェクト更新
 export async function updateProject(
-    id: string,
+    id: number,
     data: { name: string; description?: string; color?: string }
 ) {
     if (!data.name || data.name.trim() === "") {
@@ -82,7 +82,7 @@ export async function updateProject(
 }
 
 // プロジェクト削除
-export async function deleteProject(id: string) {
+export async function deleteProject(id: number) {
     try {
         await prisma.project.delete({
             where: { id },

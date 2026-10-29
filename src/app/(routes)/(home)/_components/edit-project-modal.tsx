@@ -37,7 +37,7 @@ const PROJECT_COLORS = [
 ];
 
 export interface ProjectForEdit {
-  id: string;
+  id: number;
   name: string;
   description?: string | null;
   color?: string | null;

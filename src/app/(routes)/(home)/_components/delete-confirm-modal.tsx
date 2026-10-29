@@ -5,7 +5,7 @@ import { deleteProject } from "../action";
 
 interface DeleteConfirmModalProps {
   project: {
-    id: string;
+    id: number;
     name: string;
   };
   isOpen: boolean;

@@ -1,14 +1,15 @@
 import Link from "next/link";
 
 interface PageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
-export default function ProjectDetailPage({ params }: PageProps) {
-  // 実際にはここで id をもとにデータベースやモックデータからプロジェクト情報を取得します
-  const projectId = params.id;
+export default async function ProjectDetailPage({ params }: PageProps) {
+  // Promise を await して id を取得する
+  const resolvedParams = await params;
+  const projectId = resolvedParams.id;
 
   return (
     <div className="max-w-4xl mx-auto px-6 py-8">

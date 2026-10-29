@@ -9,6 +9,7 @@ interface ProjectListProps {
   projects: Project[];
 }
 
+
 export const ProjectList = ({ projects }: ProjectListProps) => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
@@ -27,9 +28,9 @@ export const ProjectList = ({ projects }: ProjectListProps) => {
         <button
           type="button"
           onClick={() => setIsCreateModalOpen(true)}
-          className="inline-flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-lg text-sm font-medium transition-colors shadow-sm cursor-pointer self-start sm:self-auto"
+          className="inline-flex items-center justify-center bg-sky-500 hover:bg-sky-600 text-white px-4 py-2.5 rounded-lg text-sm font-medium transition-colors shadow-sm cursor-pointer self-start sm:self-auto"
         >
-          新規プロジェクト
+          ＋ 新規プロジェクト
         </button>
       </div>
 

@@ -7,11 +7,11 @@ import { DeleteConfirmModal } from "./delete-confirm-modal";
 
 export interface Task {
   id: string;
-  isCompleted: boolean;
+  status: string;
 }
 
 export interface Project {
-  id: string;
+  id: number;
   name: string;
   description?: string | null;
   color?: string | null;
@@ -39,7 +39,9 @@ export const ProjectCard = ({ project }: ProjectCardProps) => {
   const menuRef = useRef<HTMLDivElement>(null);
 
   const totalTasks = project.tasks.length;
-  const completedTaskCount = project.tasks.filter((t) => t.isCompleted).length;
+  const completedTaskCount = project.tasks.filter(
+    (t) => t.status === "DONE",
+  ).length;
   const progressPercentage =
     totalTasks > 0 ? Math.round((completedTaskCount / totalTasks) * 100) : 0;
 
@@ -60,7 +62,7 @@ export const ProjectCard = ({ project }: ProjectCardProps) => {
         {/* 上部：フォルダアイコン + タイトル ＆ 三点リーダボタン */}
         <div className="flex items-center justify-between mb-3">
           <Link
-            href={`/projects/${project.id}`}
+            href={`/project/${project.id}`}
             className="flex items-center gap-3 group flex-grow min-w-0"
           >
             {/* フォルダロゴ（背景青＋白抜き） */}
@@ -132,7 +134,7 @@ export const ProjectCard = ({ project }: ProjectCardProps) => {
         </div>
 
         {/* カード本体のリンク領域（説明文・プログレスバー・タスク件数） */}
-        <Link href={`/projects/${project.id}`} className="block">
+        <Link href={`/project/${project.id}`} className="block">
           {project.description ? (
             <p className="text-sm text-gray-600 mb-4 line-clamp-2 min-h-[2.5rem]">
               {project.description}
